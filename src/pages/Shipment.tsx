@@ -14,7 +14,7 @@ import { ShipmentReturnsSection } from '@/components/shipment/ShipmentReturnsSec
 
 export default function Shipment() {
   const { id } = useParams<{ id: string }>();
-  const { data: shipment, isLoading, error } = useFetchShipment(id);
+  const { shipment, isLoading, error } = useFetchShipment(id);
 
   if (isLoading) {
     return <div className="ml-[240px] p-6">Loading shipment details...</div>;
