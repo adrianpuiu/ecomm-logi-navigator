@@ -24,9 +24,9 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
         optimization_priority: route.optimizationPriority as string,
         constraints: route.constraints as unknown as Json,
         status: route.status as string,
-        distance: route.distance,
-        duration: route.duration,
-        estimated_cost: route.estimatedCost,
+        distance: route.distance || 0,
+        duration: route.duration || 0,
+        estimated_cost: route.estimatedCost || 0,
       }])
       .select()
       .single();
@@ -81,9 +81,19 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
       updatedAt: new Date(routeData.updated_at)
     };
 
+    toast({
+      title: "Route saved successfully",
+      description: `Route "${savedRoute.name}" has been saved.`,
+    });
+
     return savedRoute;
   } catch (error) {
     console.error('Error saving route:', error);
+    toast({
+      title: "Error saving route",
+      description: "There was a problem saving your route. Please try again.",
+      variant: "destructive"
+    });
     return null;
   }
 };
