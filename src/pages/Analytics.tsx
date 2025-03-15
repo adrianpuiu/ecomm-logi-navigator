@@ -7,12 +7,7 @@ import { DateRange } from "react-day-picker";
 import { DateRangePicker } from "@/components/analytics/DateRangePicker";
 import { FileText } from "lucide-react";
 import { KpiCardsRow } from "@/components/analytics/KpiCardsRow";
-import { ShipmentVolumeChart } from "@/components/analytics/charts/ShipmentVolumeChart";
-import { DeliveryTimeDistribution } from "@/components/analytics/charts/DeliveryTimeDistribution";
-import { CarrierPerformanceChart } from "@/components/analytics/charts/CarrierPerformanceChart";
-import { CostBreakdownChart } from "@/components/analytics/charts/CostBreakdownChart";
-import { ShipmentsByRegionMap } from "@/components/analytics/charts/ShipmentsByRegionMap";
-import { ReturnRateChart } from "@/components/analytics/charts/ReturnRateChart";
+import { ShipmentAnalyticsContent } from "@/components/analytics/ShipmentAnalyticsContent";
 
 export default function Analytics() {
   // Update the state type to match DateRange from react-day-picker
@@ -55,7 +50,7 @@ export default function Analytics() {
         
         <div className="mt-6">
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList>
+            <TabsList className="bg-background border">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="shipments">Shipments</TabsTrigger>
               <TabsTrigger value="carriers">Carriers</TabsTrigger>
@@ -64,21 +59,12 @@ export default function Analytics() {
             </TabsList>
             
             <TabsContent value="overview" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ShipmentVolumeChart dateRange={dateRange} />
-                <DeliveryTimeDistribution dateRange={dateRange} />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <CarrierPerformanceChart dateRange={dateRange} />
-                <CostBreakdownChart dateRange={dateRange} />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ShipmentsByRegionMap dateRange={dateRange} />
-                <ReturnRateChart dateRange={dateRange} />
-              </div>
+              <ShipmentAnalyticsContent dateRange={dateRange} />
             </TabsContent>
             
-            <TabsContent value="shipments">Shipment analytics content</TabsContent>
+            <TabsContent value="shipments">
+              <ShipmentAnalyticsContent dateRange={dateRange} />
+            </TabsContent>
             <TabsContent value="carriers">Carrier analytics content</TabsContent>
             <TabsContent value="costs">Cost analytics content</TabsContent>
             <TabsContent value="returns">Returns analytics content</TabsContent>
