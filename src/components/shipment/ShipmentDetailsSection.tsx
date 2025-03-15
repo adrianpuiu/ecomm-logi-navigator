@@ -12,11 +12,12 @@ import {
   CollapsibleContent, 
   CollapsibleTrigger 
 } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp, Calendar, Clock, Package, Truck, Info, Edit } from "lucide-react";
+import { Calendar, Package, Truck, Info, ChevronUp, ChevronDown, Weight, Ruler, CreditCard } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { formatDate } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 interface ShipmentDetailsSectionProps {
   shipment: ShipmentType;
@@ -26,117 +27,149 @@ export function ShipmentDetailsSection({ shipment }: ShipmentDetailsSectionProps
   const [isOpen, setIsOpen] = useState(true);
   
   return (
-    <Card className="shadow-sm">
+    <Card className="shadow-sm overflow-hidden border border-border/40 bg-gradient-to-br from-card to-background">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CardHeader className="px-6 py-4">
+        <CardHeader className="px-6 py-4 bg-card border-b border-border/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Package size={18} className="text-primary" />
-              <CardTitle className="text-xl">Shipment Details</CardTitle>
+              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Package size={16} className="text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-lg font-semibold">Shipment Details</CardTitle>
+                <CardDescription className="text-xs">
+                  Essential information about this shipment
+                </CardDescription>
+              </div>
             </div>
             <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                 {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               </Button>
             </CollapsibleTrigger>
           </div>
-          <CardDescription>
-            Essential information about this shipment
-          </CardDescription>
         </CardHeader>
         
         <CollapsibleContent>
-          <CardContent className="px-6 pb-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="space-y-3">
-                <div>
-                  <h4 className="text-sm font-medium flex items-center gap-1 text-muted-foreground">
-                    <Calendar size={14} /> Date Information
-                  </h4>
-                  <div className="mt-1 space-y-1">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Created:</span>
-                      <span className="text-sm font-medium">{formatDate(shipment.createdAt)}</span>
+          <CardContent className="px-6 py-5">
+            <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm text-primary font-medium">
+                  <Calendar size={14} />
+                  <span>Date Information</span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 rounded-md bg-card border border-border/30">
+                    <div className="text-xs text-muted-foreground mb-1">Created</div>
+                    <div className="font-medium">{formatDate(shipment.createdAt)}</div>
+                  </div>
+                  
+                  <div className="p-3 rounded-md bg-card border border-border/30">
+                    <div className="text-xs text-muted-foreground mb-1">Expected Delivery</div>
+                    <div className="font-medium">{formatDate(shipment.expectedDelivery)}</div>
+                  </div>
+                  
+                  {shipment.actualDelivery && (
+                    <div className="p-3 rounded-md bg-card border border-border/30">
+                      <div className="text-xs text-muted-foreground mb-1">Actual Delivery</div>
+                      <div className="font-medium">{formatDate(shipment.actualDelivery)}</div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Expected Delivery:</span>
-                      <span className="text-sm font-medium">{formatDate(shipment.expectedDelivery)}</span>
-                    </div>
-                    {shipment.actualDelivery && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Actual Delivery:</span>
-                        <span className="text-sm font-medium">{formatDate(shipment.actualDelivery)}</span>
-                      </div>
-                    )}
+                  )}
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm text-primary font-medium">
+                  <Truck size={14} />
+                  <span>Carrier & Service</span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 rounded-md bg-card border border-border/30">
+                    <div className="text-xs text-muted-foreground mb-1">Carrier</div>
+                    <div className="font-medium">{shipment.carrier.name}</div>
+                  </div>
+                  
+                  <div className="p-3 rounded-md bg-card border border-border/30">
+                    <div className="text-xs text-muted-foreground mb-1">Tracking Number</div>
+                    <div className="font-medium font-mono text-xs">{shipment.carrier.trackingNumber}</div>
+                  </div>
+                  
+                  <div className="p-3 rounded-md bg-card border border-border/30">
+                    <div className="text-xs text-muted-foreground mb-1">Service Level</div>
+                    <div className="font-medium">{shipment.carrier.serviceLevel}</div>
+                  </div>
+                  
+                  <div className="p-3 rounded-md bg-card border border-border/30">
+                    <div className="text-xs text-muted-foreground mb-1">Shipping Method</div>
+                    <Badge variant="outline" className="font-normal capitalize">
+                      {shipment.shippingMethod}
+                    </Badge>
                   </div>
                 </div>
               </div>
               
-              <div className="space-y-3">
-                <div>
-                  <h4 className="text-sm font-medium flex items-center gap-1 text-muted-foreground">
-                    <Truck size={14} /> Carrier & Service
-                  </h4>
-                  <div className="mt-1 space-y-1">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Carrier:</span>
-                      <span className="text-sm font-medium">{shipment.carrier.name}</span>
+              <Separator />
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm text-primary font-medium">
+                  <div className="flex items-center gap-2">
+                    <Package size={14} />
+                    <span>Package Details</span>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="p-3 rounded-md bg-card border border-border/30">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                      <Weight size={12} />
+                      <span>Weight</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Tracking Number:</span>
-                      <span className="text-sm font-medium">{shipment.carrier.trackingNumber}</span>
+                    <div className="font-medium">
+                      {shipment.weight.value} {shipment.weight.unit}
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Service Level:</span>
-                      <span className="text-sm font-medium">{shipment.carrier.serviceLevel}</span>
+                  </div>
+                  
+                  <div className="p-3 rounded-md bg-card border border-border/30">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                      <Ruler size={12} />
+                      <span>Dimensions</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Shipping Method:</span>
-                      <Badge variant="outline" className="font-normal capitalize">
-                        {shipment.shippingMethod}
-                      </Badge>
+                    <div className="font-medium">
+                      {shipment.dimensions.length} × {shipment.dimensions.width} × {shipment.dimensions.height} {shipment.dimensions.unit}
+                    </div>
+                  </div>
+                  
+                  <div className="p-3 rounded-md bg-card border border-border/30">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                      <CreditCard size={12} />
+                      <span>Declared Value</span>
+                    </div>
+                    <div className="font-medium">
+                      {shipment.declaredValue.currency} {shipment.declaredValue.amount.toFixed(2)}
                     </div>
                   </div>
                 </div>
               </div>
               
-              <div className="space-y-3">
-                <div>
-                  <h4 className="text-sm font-medium flex items-center gap-1 text-muted-foreground">
-                    <Package size={14} /> Package Details
-                  </h4>
-                  <div className="mt-1 space-y-1">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Weight:</span>
-                      <span className="text-sm font-medium">
-                        {shipment.weight.value} {shipment.weight.unit}
-                      </span>
+              {shipment.specialInstructions && (
+                <>
+                  <Separator />
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-primary font-medium">
+                      <Info size={14} />
+                      <span>Special Instructions</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Dimensions:</span>
-                      <span className="text-sm font-medium">
-                        {shipment.dimensions.length} × {shipment.dimensions.width} × {shipment.dimensions.height} {shipment.dimensions.unit}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Declared Value:</span>
-                      <span className="text-sm font-medium">
-                        {shipment.declaredValue.currency} {shipment.declaredValue.amount.toFixed(2)}
-                      </span>
+                    <div className="px-4 py-3 rounded-md bg-amber-50 border border-amber-200 text-amber-800">
+                      <p className="text-sm">{shipment.specialInstructions}</p>
                     </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
-            
-            {shipment.specialInstructions && (
-              <div className="mt-6 bg-muted p-3 rounded-md">
-                <h4 className="text-sm font-medium flex items-center gap-1 text-muted-foreground mb-1">
-                  <Info size={14} /> Special Instructions
-                </h4>
-                <p className="text-sm">{shipment.specialInstructions}</p>
-              </div>
-            )}
           </CardContent>
         </CollapsibleContent>
       </Collapsible>
