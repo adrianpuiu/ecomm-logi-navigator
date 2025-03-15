@@ -11,7 +11,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { RouteStop, OptimizationPriority, RouteConstraint, Driver, Vehicle, Route, RouteStatus } from "@/types/route";
+import { 
+  RouteStop, 
+  OptimizationPriority, 
+  RouteConstraint, 
+  Driver, 
+  Vehicle, 
+  Route, 
+  RouteStatus 
+} from "@/types/route";
 import { saveRoute, validateRouteData } from "@/utils/routeUtils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

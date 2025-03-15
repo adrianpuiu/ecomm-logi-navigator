@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Route, RouteStop, RouteStatus } from "@/types/route";
+import { Route, RouteStop, RouteStatus, RouteConstraint, OptimizationPriority } from "@/types/route";
 import { toast } from "@/components/ui/use-toast";
 
 /**
@@ -15,9 +15,9 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
       .from('routes')
       .insert({
         name: route.name,
-        date: route.date,
-        time_window_start: route.timeWindow?.start,
-        time_window_end: route.timeWindow?.end,
+        date: route.date?.toISOString(),
+        time_window_start: route.timeWindow?.start?.toISOString(),
+        time_window_end: route.timeWindow?.end?.toISOString(),
         driver_id: route.driver?.id,
         vehicle_id: route.vehicle?.id,
         optimization_priority: route.optimizationPriority,
@@ -44,8 +44,8 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
         longitude: stop.longitude,
         type: stop.type,
         order_index: index,
-        arrival_time: stop.arrivalTime,
-        departure_time: stop.departureTime,
+        arrival_time: stop.arrivalTime?.toISOString(),
+        departure_time: stop.departureTime?.toISOString(),
       }));
 
       const { error: stopsError } = await supabase
@@ -70,8 +70,8 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
       stops: route.stops || [],
       driver: route.driver,
       vehicle: route.vehicle,
-      optimizationPriority: routeData.optimization_priority,
-      constraints: routeData.constraints,
+      optimizationPriority: routeData.optimization_priority as OptimizationPriority,
+      constraints: routeData.constraints as RouteConstraint,
       status: routeData.status as RouteStatus,
       distance: routeData.distance,
       duration: routeData.duration,
