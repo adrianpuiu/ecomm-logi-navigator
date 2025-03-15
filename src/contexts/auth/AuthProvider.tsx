@@ -19,7 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         userRoles: [],
         isLoading: false,
         signIn: async () => {},
-        signUp: async () => ({ userId: undefined }),
+        signUp: async () => {}, // Fixed: return type is now void instead of { userId: undefined }
         signOut: async () => {},
         hasRole,
         hasAnyRole,
