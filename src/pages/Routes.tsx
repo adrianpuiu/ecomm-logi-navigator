@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Helmet } from "react-helmet";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -11,11 +10,89 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
+import { RouteStop } from "@/types/route";
 
 export default function Routes() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("plan");
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [stops, setStops] = useState<RouteStop[]>([
+    { 
+      id: "origin", 
+      address: "", 
+      type: "origin",
+      latitude: undefined,
+      longitude: undefined
+    },
+    { 
+      id: "destination", 
+      address: "", 
+      type: "destination",
+      latitude: undefined,
+      longitude: undefined
+    }
+  ]);
+  
+  const handleAddStop = (stop: RouteStop) => {
+    // If this is the first stop and we have an empty origin, use it as origin
+    if (stops[0].address === "" && !stops[0].latitude && !stops[0].longitude) {
+      const newStops = [...stops];
+      newStops[0] = { ...stop, id: "origin", type: "origin" };
+      setStops(newStops);
+      toast({
+        title: "Starting Point Added",
+        description: `${stop.address} has been set as the starting point.`
+      });
+      return;
+    }
+    
+    // If this is the second stop and we have an empty destination, use it as destination
+    if (stops[1].address === "" && !stops[1].latitude && !stops[1].longitude) {
+      const newStops = [...stops];
+      newStops[1] = { ...stop, id: "destination", type: "destination" };
+      setStops(newStops);
+      toast({
+        title: "Destination Added",
+        description: `${stop.address} has been set as the destination.`
+      });
+      return;
+    }
+    
+    // Otherwise, add as waypoint
+    const newStops = [...stops];
+    // Insert the waypoint before the destination
+    newStops.splice(newStops.length - 1, 0, stop);
+    setStops(newStops);
+    toast({
+      title: "Waypoint Added",
+      description: `${stop.address} has been added as a waypoint.`
+    });
+  };
+  
+  const handleUpdateStop = (stopId: string, updatedStop: Partial<RouteStop>) => {
+    setStops(stops.map(stop => 
+      stop.id === stopId ? { ...stop, ...updatedStop } : stop
+    ));
+  };
+  
+  const handleRemoveStop = (stopId: string) => {
+    // Don't allow removing origin or destination
+    if (stopId === "origin" || stopId === "destination") {
+      const stopType = stopId === "origin" ? "starting point" : "destination";
+      toast({
+        title: "Cannot Remove Stop",
+        description: `The ${stopType} cannot be removed, but you can change its location.`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setStops(stops.filter(stop => stop.id !== stopId));
+    toast({
+      title: "Waypoint Removed",
+      description: "The selected waypoint has been removed from the route."
+    });
+  };
   
   const handleOptimizeRoute = () => {
     setIsOptimizing(true);
@@ -52,12 +129,17 @@ export default function Routes() {
               <div className="flex items-center space-x-2">
                 <Button 
                   onClick={handleOptimizeRoute} 
-                  disabled={isOptimizing}
+                  disabled={isOptimizing || stops.filter(s => s.latitude && s.longitude).length < 2}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
                   {isOptimizing ? "Optimizing..." : "Optimize Route"}
                 </Button>
-                <Button onClick={handleSaveRoute}>Save Route</Button>
+                <Button 
+                  onClick={handleSaveRoute}
+                  disabled={stops.filter(s => s.latitude && s.longitude).length < 2}
+                >
+                  Save Route
+                </Button>
               </div>
             </div>
             
@@ -73,13 +155,21 @@ export default function Routes() {
                   <div className="lg:col-span-2">
                     <Card>
                       <CardContent className="p-0">
-                        <Map />
+                        <Map 
+                          stops={stops} 
+                          onAddStop={handleAddStop} 
+                        />
                       </CardContent>
                     </Card>
                   </div>
                   
                   <div className="space-y-4">
-                    <RouteParameters />
+                    <RouteParameters 
+                      stops={stops}
+                      onUpdateStop={handleUpdateStop}
+                      onRemoveStop={handleRemoveStop}
+                      onAddStop={handleAddStop}
+                    />
                     <RouteOptimizationOptions />
                     <div className="grid grid-cols-2 gap-4">
                       <DriverSelector />
