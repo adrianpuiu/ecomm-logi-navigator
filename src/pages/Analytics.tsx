@@ -27,48 +27,51 @@ export default function Analytics() {
         <title>Analytics | LogiNav</title>
       </Helmet>
 
-      <div className="ml-[240px] flex flex-col min-h-screen bg-background p-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
-            <p className="text-muted-foreground">Track and analyze your logistics performance</p>
+      {/* Updated the container to ensure it doesn't get behind the sidebar */}
+      <div className="flex flex-col min-h-screen bg-background ml-[240px] w-[calc(100%-240px)]">
+        <div className="p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
+              <p className="text-muted-foreground">Track and analyze your logistics performance</p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <DateRangePicker 
+                dateRange={dateRange}
+                onUpdate={handleDateRangeChange}
+              />
+              <Button>
+                <FileText className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+            </div>
           </div>
           
-          <div className="flex items-center gap-3">
-            <DateRangePicker 
-              dateRange={dateRange}
-              onUpdate={handleDateRangeChange}
-            />
-            <Button>
-              <FileText className="mr-2 h-4 w-4" />
-              Export
-            </Button>
+          <KpiCardsRow dateRange={dateRange} />
+          
+          <div className="mt-6">
+            <Tabs defaultValue="overview" className="space-y-4">
+              <TabsList className="bg-background border">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="shipments">Shipments</TabsTrigger>
+                <TabsTrigger value="carriers">Carriers</TabsTrigger>
+                <TabsTrigger value="costs">Costs</TabsTrigger>
+                <TabsTrigger value="returns">Returns</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="overview" className="space-y-4">
+                <ShipmentAnalyticsContent dateRange={dateRange} />
+              </TabsContent>
+              
+              <TabsContent value="shipments">
+                <ShipmentAnalyticsContent dateRange={dateRange} />
+              </TabsContent>
+              <TabsContent value="carriers">Carrier analytics content</TabsContent>
+              <TabsContent value="costs">Cost analytics content</TabsContent>
+              <TabsContent value="returns">Returns analytics content</TabsContent>
+            </Tabs>
           </div>
-        </div>
-        
-        <KpiCardsRow dateRange={dateRange} />
-        
-        <div className="mt-6">
-          <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="bg-background border">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="shipments">Shipments</TabsTrigger>
-              <TabsTrigger value="carriers">Carriers</TabsTrigger>
-              <TabsTrigger value="costs">Costs</TabsTrigger>
-              <TabsTrigger value="returns">Returns</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="overview" className="space-y-4">
-              <ShipmentAnalyticsContent dateRange={dateRange} />
-            </TabsContent>
-            
-            <TabsContent value="shipments">
-              <ShipmentAnalyticsContent dateRange={dateRange} />
-            </TabsContent>
-            <TabsContent value="carriers">Carrier analytics content</TabsContent>
-            <TabsContent value="costs">Cost analytics content</TabsContent>
-            <TabsContent value="returns">Returns analytics content</TabsContent>
-          </Tabs>
         </div>
       </div>
     </>
