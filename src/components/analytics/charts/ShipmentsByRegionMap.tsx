@@ -12,6 +12,14 @@ interface ShipmentsByRegionMapProps {
   dateRange: DateRange | undefined;
 }
 
+// Define a proper type for our region data with correctly typed coordinates
+interface RegionData {
+  name: string;
+  shipments: number;
+  percentage: number;
+  coordinates: [number, number]; // This ensures it's a tuple of exactly 2 numbers
+}
+
 export function ShipmentsByRegionMap({ dateRange }: ShipmentsByRegionMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -20,7 +28,8 @@ export function ShipmentsByRegionMap({ dateRange }: ShipmentsByRegionMapProps) {
   const { toast } = useToast();
 
   // Mock data - in a real app, this would be fetched based on the date range
-  const regions = [
+  // Ensure our regions data conforms to the RegionData type
+  const regions: RegionData[] = [
     { name: "Northeast", shipments: 1245, percentage: 28, coordinates: [-74.0060, 40.7128] }, // NYC
     { name: "Southeast", shipments: 873, percentage: 19, coordinates: [-84.3880, 33.7490] }, // Atlanta
     { name: "Midwest", shipments: 645, percentage: 14, coordinates: [-87.6298, 41.8781] }, // Chicago
@@ -68,7 +77,7 @@ export function ShipmentsByRegionMap({ dateRange }: ShipmentsByRegionMapProps) {
               </div>
             `);
           
-          // Add marker to map
+          // Add marker to map - now using properly typed coordinates that match LngLatLike
           new mapboxgl.Marker(markerEl)
             .setLngLat(region.coordinates)
             .setPopup(popup)
