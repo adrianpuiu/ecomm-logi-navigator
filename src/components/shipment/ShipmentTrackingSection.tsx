@@ -154,7 +154,10 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
 
           // Fit map to show all markers
           const bounds = new mapboxgl.LngLatBounds();
-          mockCoordinates.forEach(coord => bounds.extend(coord));
+          mockCoordinates.forEach(coord => {
+            // Fix: Pass a proper LngLatLike object instead of an array
+            bounds.extend(new mapboxgl.LngLat(coord[0], coord[1]));
+          });
           map.fitBounds(bounds, { padding: 50 });
         });
       }
