@@ -14,20 +14,20 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
     // First save the main route
     const { data: routeData, error: routeError } = await supabase
       .from('routes')
-      .insert([{  // Wrap the object in an array
+      .insert({
         name: route.name,
         date: route.date?.toISOString(),
         time_window_start: route.timeWindow?.start?.toISOString(),
         time_window_end: route.timeWindow?.end?.toISOString(),
         driver_id: route.driver?.id,
         vehicle_id: route.vehicle?.id,
-        optimization_priority: route.optimizationPriority,
+        optimization_priority: route.optimizationPriority as string,
         constraints: route.constraints as unknown as Json,
-        status: route.status,
+        status: route.status as string,
         distance: route.distance,
         duration: route.duration,
         estimated_cost: route.estimatedCost,
-      }])
+      })
       .select()
       .single();
 
