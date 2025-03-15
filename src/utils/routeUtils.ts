@@ -273,7 +273,7 @@ export const fetchRoutes = async (filter?: {
     const routes = data.map(item => {
       // Create a properly formatted driver object that matches our Driver type
       const driver = item.drivers ? {
-        id: item.drivers.id,
+        id: Number(item.drivers.id), // Convert string ID to number
         name: `${item.drivers.first_name} ${item.drivers.last_name}`.trim(),
         email: item.drivers.email || '',
         phone: item.drivers.phone || '',
@@ -287,7 +287,7 @@ export const fetchRoutes = async (filter?: {
       
       // Create a properly formatted vehicle object that matches our Vehicle type
       const vehicle = item.vehicles ? {
-        id: item.vehicles.id,
+        id: Number(item.vehicles.id), // Convert string ID to number
         name: item.vehicles.name,
         type: item.vehicles.type as VehicleType,
         licensePlate: item.vehicles.license_plate,
@@ -358,7 +358,7 @@ export const fetchDrivers = async (): Promise<Driver[]> => {
     if (error) throw error;
     
     return data.map((driver: any) => ({
-      id: driver.id,
+      id: Number(driver.id), // Convert string ID to number
       name: `${driver.first_name} ${driver.last_name}`.trim(),
       email: driver.email || '',
       phone: driver.phone || '',
@@ -389,7 +389,7 @@ export const fetchVehicles = async (): Promise<Vehicle[]> => {
     if (error) throw error;
     
     return data.map((vehicle: any) => ({
-      id: vehicle.id,
+      id: Number(vehicle.id), // Convert string ID to number
       name: vehicle.name,
       type: vehicle.type as VehicleType,
       licensePlate: vehicle.license_plate,
