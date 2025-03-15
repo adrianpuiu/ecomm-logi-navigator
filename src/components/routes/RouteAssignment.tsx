@@ -304,7 +304,7 @@ export function RouteAssignment() {
                         <TableRow key={driver.id}>
                           <TableCell className="font-medium">{driver.name}</TableCell>
                           <TableCell>
-                            <Badge variant={driver.status === "available" ? "success" : "secondary"}>
+                            <Badge variant={driver.status === "available" ? "default" : "secondary"}>
                               {driver.status === "available" ? "Available" : "On Route"}
                             </Badge>
                           </TableCell>
@@ -389,7 +389,7 @@ export function RouteAssignment() {
                             <Badge 
                               variant={
                                 vehicle.status === "available" 
-                                  ? "success" 
+                                  ? "default" 
                                   : vehicle.status === "maintenance" 
                                     ? "destructive" 
                                     : "secondary"
