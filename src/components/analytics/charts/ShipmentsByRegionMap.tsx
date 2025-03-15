@@ -5,7 +5,7 @@ import { Globe } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 interface ShipmentsByRegionMapProps {
-  dateRange: DateRange;
+  dateRange: DateRange | undefined;
 }
 
 export function ShipmentsByRegionMap({ dateRange }: ShipmentsByRegionMapProps) {

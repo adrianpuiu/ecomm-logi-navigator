@@ -13,10 +13,15 @@ import { DateRange } from 'react-day-picker';
 
 export default function Analytics() {
   // Update the state type to match DateRange from react-day-picker
-  const [dateRange, setDateRange] = useState<DateRange>({
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
     to: new Date(),
   });
+
+  // Create a handler function that explicitly accepts DateRange
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    setDateRange(range);
+  };
 
   return (
     <>
@@ -35,7 +40,7 @@ export default function Analytics() {
           <div className="flex items-center gap-3">
             <DateRangePicker 
               dateRange={dateRange}
-              onUpdate={setDateRange}
+              onUpdate={handleDateRangeChange}
             />
             <Button>
               <FileText className="mr-2 h-4 w-4" />
@@ -78,4 +83,3 @@ export default function Analytics() {
     </>
   );
 }
-

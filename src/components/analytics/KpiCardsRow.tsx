@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 interface KpiCardsRowProps {
-  dateRange: DateRange;
+  dateRange: DateRange | undefined;
 }
 
 export function KpiCardsRow({ dateRange }: KpiCardsRowProps) {
