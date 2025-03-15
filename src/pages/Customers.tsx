@@ -26,7 +26,7 @@ export default function Customers() {
         <title>Customers | Logistics TMS</title>
       </Helmet>
       
-      <div className="flex flex-col gap-6 p-4 md:p-6">
+      <div className="flex flex-col gap-6 p-4 md:p-6 ml-[240px]">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
           <p className="text-muted-foreground">

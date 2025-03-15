@@ -27,7 +27,7 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <div
       className={cn(
-        "fixed left-0 top-16 bottom-0 z-40 flex flex-col border-r transition-all duration-300",
+        "fixed left-0 top-16 bottom-0 z-40 flex flex-col border-r bg-background transition-all duration-300",
         collapsed ? "w-[60px]" : "w-[240px]",
         className
       )}
