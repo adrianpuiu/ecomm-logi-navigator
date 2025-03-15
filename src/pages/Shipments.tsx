@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Navbar } from "@/components/layout/Navbar";
@@ -38,12 +37,17 @@ import {
   Truck,
   AlertCircle,
   CheckCircle,
-  Clock
+  Clock,
+  CalendarRange,
+  Filter,
+  X
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { ShipmentType, ShipmentStatus } from "@/types/shipment";
 import { mockShipment } from "@/data/mockShipment";
+import { StatusFilter } from "@/components/shipment/StatusFilter";
+import { DateRangeFilter } from "@/components/shipment/DateRangeFilter";
 
 // Create mock data for shipment listings
 const mockShipments: ShipmentType[] = Array(10).fill(null).map((_, index) => {
@@ -67,15 +71,6 @@ const mockShipments: ShipmentType[] = Array(10).fill(null).map((_, index) => {
     createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
   };
 });
-
-// Filter shipments by status
-const activeShipments = mockShipments.filter(s => 
-  ["created", "processing", "picked_up", "in_transit", "out_for_delivery", "delayed"].includes(s.status)
-);
-
-const deliveredShipments = mockShipments.filter(s => s.status === "delivered");
-
-const returnShipments = mockShipments.filter(s => s.status === "returned");
 
 // Status badge colors
 const statusColors: Record<string, string> = {
@@ -106,6 +101,10 @@ const statusIcons: Record<string, React.ReactNode> = {
 
 export default function Shipments() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<ShipmentStatus | 'all'>('all');
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [activeTab, setActiveTab] = useState("active");
   const { toast } = useToast();
   
   const formatDate = (dateString: string) => {
@@ -123,6 +122,59 @@ export default function Shipments() {
       description: "Your shipments data is being exported to CSV"
     });
   };
+
+  const handleDateRangeChange = (start: Date | undefined, end: Date | undefined) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
+
+  const resetFilters = () => {
+    setSearchQuery("");
+    setSelectedStatus("all");
+    setStartDate(undefined);
+    setEndDate(undefined);
+  };
+
+  const hasActiveFilters = searchQuery || selectedStatus !== 'all' || startDate || endDate;
+
+  const filteredShipments = useMemo(() => {
+    let filteredData = [...mockShipments];
+    
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filteredData = filteredData.filter(shipment => 
+        shipment.id.toLowerCase().includes(query) || 
+        shipment.orderId.toLowerCase().includes(query)
+      );
+    }
+    
+    if (selectedStatus !== 'all') {
+      filteredData = filteredData.filter(shipment => shipment.status === selectedStatus);
+    }
+    
+    if (startDate && endDate) {
+      const start = startDate.setHours(0, 0, 0, 0);
+      const end = endDate.setHours(23, 59, 59, 999);
+      
+      filteredData = filteredData.filter(shipment => {
+        const createdDate = new Date(shipment.createdAt).getTime();
+        return createdDate >= start && createdDate <= end;
+      });
+    }
+    
+    return filteredData;
+  }, [mockShipments, searchQuery, selectedStatus, startDate, endDate]);
+  
+  const activeShipments = useMemo(() => 
+    filteredShipments.filter(s => 
+      ["created", "processing", "picked_up", "in_transit", "out_for_delivery", "delayed"].includes(s.status)
+    ), [filteredShipments]);
+
+  const deliveredShipments = useMemo(() => 
+    filteredShipments.filter(s => s.status === "delivered"), [filteredShipments]);
+
+  const returnShipments = useMemo(() => 
+    filteredShipments.filter(s => s.status === "returned"), [filteredShipments]);
   
   const renderShipmentTable = (shipments: ShipmentType[]) => (
     <div className="rounded-md border">
@@ -189,17 +241,6 @@ export default function Shipments() {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <div className="relative w-full sm:w-[280px]">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  type="search" 
-                  placeholder="Search shipments..." 
-                  className="pl-8" 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              
               <Button asChild>
                 <Link to="/shipments/create">
                   <Plus className="mr-2 h-4 w-4" />
@@ -214,7 +255,43 @@ export default function Shipments() {
             </div>
           </div>
           
-          <Tabs defaultValue="active" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                type="search" 
+                placeholder="Search by ID or order..." 
+                className="pl-8" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            <StatusFilter 
+              onStatusChange={setSelectedStatus}
+              selectedStatus={selectedStatus}
+            />
+            
+            <DateRangeFilter onDateRangeChange={handleDateRangeChange} />
+            
+            {hasActiveFilters && (
+              <Button 
+                variant="outline" 
+                onClick={resetFilters}
+                className="flex items-center gap-1"
+              >
+                <X className="h-4 w-4" />
+                Clear Filters
+              </Button>
+            )}
+          </div>
+          
+          <Tabs 
+            defaultValue="active" 
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="space-y-4"
+          >
             <TabsList>
               <TabsTrigger value="active" className="flex items-center gap-2">
                 <Truck size={16} />
