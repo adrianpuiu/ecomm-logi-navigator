@@ -9,6 +9,9 @@ import { MapPin, Clock, Package, AlertCircle, LocateFixed, Truck } from "lucide-
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
+// Define delivery status type for type safety
+type DeliveryStatus = "picked_up" | "out_for_delivery" | "in_transit" | "delayed" | "exception" | "delivered";
+
 // Mock data for active deliveries
 const MOCK_ACTIVE_DELIVERIES = [
   {
@@ -19,7 +22,7 @@ const MOCK_ACTIVE_DELIVERIES = [
     address: "Sokolovská 42, Prague 8, 18000",
     requestedWindow: "1:00 PM - 4:00 PM",
     estimatedArrival: "2:45 PM",
-    status: "in_transit",
+    status: "in_transit" as DeliveryStatus,
     driver: "Karel Jančík",
     vehicleId: "VAN-04",
     currentLocation: {
@@ -36,7 +39,7 @@ const MOCK_ACTIVE_DELIVERIES = [
     address: "Bělehradská 78, Prague 2, 12000",
     requestedWindow: "2:00 PM - 5:00 PM",
     estimatedArrival: "3:15 PM",
-    status: "out_for_delivery",
+    status: "out_for_delivery" as DeliveryStatus,
     driver: "Tomáš Horák",
     vehicleId: "VAN-02",
     currentLocation: {
@@ -53,7 +56,7 @@ const MOCK_ACTIVE_DELIVERIES = [
     address: "Na Florenci 35, Prague 1, 11000",
     requestedWindow: "12:00 PM - 3:00 PM",
     estimatedArrival: "2:10 PM",
-    status: "delayed",
+    status: "delayed" as DeliveryStatus,
     driver: "Jana Malá",
     vehicleId: "VAN-01",
     currentLocation: {
@@ -71,7 +74,7 @@ const MOCK_ACTIVE_DELIVERIES = [
     address: "Polská 15, Prague 2, 12000",
     requestedWindow: "3:00 PM - 6:00 PM",
     estimatedArrival: "4:00 PM",
-    status: "picked_up",
+    status: "picked_up" as DeliveryStatus,
     driver: "Martin Kos",
     vehicleId: "VAN-03",
     currentLocation: {
@@ -88,7 +91,7 @@ const MOCK_ACTIVE_DELIVERIES = [
     address: "Ohradní 65, Prague 4, 14000",
     requestedWindow: "2:00 PM - 5:00 PM",
     estimatedArrival: "4:30 PM",
-    status: "exception",
+    status: "exception" as DeliveryStatus,
     driver: "Pavel Krejčí",
     vehicleId: "VAN-05",
     currentLocation: {
@@ -99,8 +102,6 @@ const MOCK_ACTIVE_DELIVERIES = [
     exceptionDetails: "Customer unavailable at delivery address"
   }
 ];
-
-type DeliveryStatus = "picked_up" | "out_for_delivery" | "in_transit" | "delayed" | "exception" | "delivered";
 
 interface ActiveDelivery {
   id: string;

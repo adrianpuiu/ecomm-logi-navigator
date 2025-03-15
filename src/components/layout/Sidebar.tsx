@@ -1,142 +1,73 @@
 
-import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
+  BarChart3,
+  Boxes,
   LayoutDashboard,
   Package,
+  RotateCcw,
   Truck,
   Users,
-  BarChart3,
-  Settings,
-  History,
-  ChevronRight,
-  ArrowLeftRight,
-  PanelLeft,
-  Map
+  Route,
+  Timer,
 } from "lucide-react";
 
-interface SidebarProps {
-  className?: string;
-}
-
-export function Sidebar({ className }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
+export function Sidebar() {
   const location = useLocation();
-  
-  return (
-    <aside
-      className={cn(
-        "fixed left-0 top-0 bottom-0 z-40 flex flex-col border-r bg-background transition-all duration-300 pt-16",
-        collapsed ? "w-[60px]" : "w-[240px]",
-        className
-      )}
-    >
-      <div className="flex flex-col flex-grow p-2 space-y-1 overflow-y-auto">
-        <SidebarItem 
-          icon={<LayoutDashboard size={20} />} 
-          label="Dashboard" 
-          to="/" 
-          active={location.pathname === "/"} 
-          collapsed={collapsed}
-        />
-        <SidebarItem 
-          icon={<Package size={20} />} 
-          label="Shipments" 
-          to="/shipments" 
-          active={location.pathname.startsWith("/shipment")} 
-          collapsed={collapsed}
-        />
-        <SidebarItem 
-          icon={<Truck size={20} />} 
-          label="Carriers" 
-          to="/carriers" 
-          active={location.pathname.startsWith("/carrier")} 
-          collapsed={collapsed}
-        />
-        <SidebarItem 
-          icon={<Map size={20} />} 
-          label="Route Planning" 
-          to="/routes" 
-          active={location.pathname.startsWith("/routes")} 
-          collapsed={collapsed} 
-        />
-        <SidebarItem 
-          icon={<ArrowLeftRight size={20} />} 
-          label="Returns" 
-          to="/returns" 
-          active={location.pathname.startsWith("/returns")} 
-          collapsed={collapsed}
-        />
-        <SidebarItem 
-          icon={<Users size={20} />} 
-          label="Customers" 
-          to="/customers" 
-          active={location.pathname.startsWith("/customers")} 
-          collapsed={collapsed}
-        />
-        <SidebarItem 
-          icon={<BarChart3 size={20} />} 
-          label="Analytics" 
-          to="/analytics" 
-          active={location.pathname.startsWith("/analytics")} 
-          collapsed={collapsed}
-        />
-        <SidebarItem 
-          icon={<History size={20} />} 
-          label="History" 
-          to="/history" 
-          active={location.pathname.startsWith("/history")} 
-          collapsed={collapsed}
-        />
-        <SidebarItem 
-          icon={<Settings size={20} />} 
-          label="Settings" 
-          to="/settings" 
-          active={location.pathname.startsWith("/settings")} 
-          collapsed={collapsed}
-        />
-      </div>
-      
-      <div className="p-2 border-t">
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center justify-center w-full p-2 rounded-md hover:bg-accent"
-        >
-          <PanelLeft size={18} className={cn("transition-transform", collapsed ? "rotate-180" : "")} />
-          {!collapsed && <span className="ml-2 text-sm">Collapse</span>}
-        </button>
-      </div>
-    </aside>
-  );
-}
+  const pathname = location.pathname;
 
-interface SidebarItemProps {
-  icon: React.ReactNode;
-  label: string;
-  to: string;
-  active?: boolean;
-  collapsed?: boolean;
-}
+  const isActive = (path: string) => {
+    if (path === "/") {
+      return pathname === "/";
+    }
+    return pathname.startsWith(path);
+  };
 
-function SidebarItem({ icon, label, to, active = false, collapsed = false }: SidebarItemProps) {
+  const navigation = [
+    { name: "Dashboard", href: "/", icon: LayoutDashboard },
+    { name: "Shipments", href: "/shipments", icon: Boxes },
+    { name: "Carriers", href: "/carriers", icon: Truck },
+    { name: "Routes", href: "/routes", icon: Route },
+    { name: "Returns", href: "/returns", icon: RotateCcw },
+    { name: "Customers", href: "/customers", icon: Users },
+    { name: "Same-Day Delivery", href: "/same-day-delivery", icon: Timer },
+    { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  ];
+
   return (
-    <Link
-      to={to}
-      className={cn(
-        "flex items-center px-2 py-2.5 rounded-md text-sm font-medium transition-colors",
-        active 
-          ? "bg-primary/10 text-primary dark:bg-primary/20" 
-          : "text-muted-foreground hover:bg-muted hover:text-foreground"
-      )}
-    >
-      <span className="w-6 h-6 flex items-center justify-center">{icon}</span>
-      {!collapsed && (
-        <>
-          <span className="ml-2 flex-grow">{label}</span>
-          {active && <ChevronRight size={16} />}
-        </>
-      )}
-    </Link>
+    <div className="fixed left-0 top-0 z-20 flex h-full w-[240px] flex-col border-r bg-background">
+      <div className="p-6">
+        <Link to="/" className="flex items-center gap-2 font-semibold">
+          <Package className="h-6 w-6" />
+          <span className="text-xl">Logistics TMS</span>
+        </Link>
+      </div>
+      <nav className="flex-1 space-y-1 p-4">
+        {navigation.map((item) => (
+          <Link
+            key={item.name}
+            to={item.href}
+            className={cn(
+              isActive(item.href)
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              "group flex items-center rounded-md px-3 py-2 text-sm font-medium"
+            )}
+          >
+            <item.icon
+              className={cn(
+                isActive(item.href)
+                  ? "text-accent-foreground"
+                  : "text-muted-foreground group-hover:text-foreground",
+                "mr-3 h-5 w-5 flex-shrink-0"
+              )}
+              aria-hidden="true"
+            />
+            {item.name}
+          </Link>
+        ))}
+      </nav>
+    </div>
   );
 }

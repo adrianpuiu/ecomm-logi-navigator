@@ -9,13 +9,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CalendarIcon, Clock, MapPin, Truck, User, Package, RefreshCw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
+// Define driver status type for type safety
+type DriverStatus = "active" | "break" | "offline";
+
+// Define delivery status type for type safety
+type PendingDeliveryStatus = "ready_for_dispatch";
+type PreparingDeliveryStatus = "picking" | "packing" | "waiting";
+
 // Mock data for available drivers
 const MOCK_DRIVERS = [
   {
     id: "DRV-01",
     name: "Karel Jančík",
     avatar: "",
-    status: "active",
+    status: "active" as DriverStatus,
     availableUntil: "8:00 PM",
     currentLocation: "Prague 8",
     completedToday: 7,
@@ -29,7 +36,7 @@ const MOCK_DRIVERS = [
     id: "DRV-02",
     name: "Tomáš Horák",
     avatar: "",
-    status: "active",
+    status: "active" as DriverStatus,
     availableUntil: "6:00 PM",
     currentLocation: "Prague 2",
     completedToday: 5,
@@ -43,7 +50,7 @@ const MOCK_DRIVERS = [
     id: "DRV-03",
     name: "Jana Malá",
     avatar: "",
-    status: "active",
+    status: "active" as DriverStatus,
     availableUntil: "7:00 PM",
     currentLocation: "Prague 1",
     completedToday: 6,
@@ -57,7 +64,7 @@ const MOCK_DRIVERS = [
     id: "DRV-04",
     name: "Martin Kos",
     avatar: "",
-    status: "break",
+    status: "break" as DriverStatus,
     availableUntil: "7:30 PM",
     currentLocation: "Prague 2",
     completedToday: 4,
@@ -71,7 +78,7 @@ const MOCK_DRIVERS = [
     id: "DRV-05",
     name: "Pavel Krejčí",
     avatar: "",
-    status: "active",
+    status: "active" as DriverStatus,
     availableUntil: "8:00 PM",
     currentLocation: "Prague 4",
     completedToday: 6,
@@ -92,7 +99,7 @@ const MOCK_PENDING_DELIVERIES = [
     items: 2,
     address: "Vinohradská 112, Prague 3, 13000",
     requestedWindow: "4:00 PM - 7:00 PM",
-    status: "ready_for_dispatch",
+    status: "ready_for_dispatch" as PendingDeliveryStatus,
     priority: "normal"
   },
   {
@@ -102,7 +109,7 @@ const MOCK_PENDING_DELIVERIES = [
     items: 1,
     address: "Anglická 28, Prague 2, 12000",
     requestedWindow: "3:00 PM - 6:00 PM",
-    status: "ready_for_dispatch",
+    status: "ready_for_dispatch" as PendingDeliveryStatus,
     priority: "high"
   },
   {
@@ -112,7 +119,7 @@ const MOCK_PENDING_DELIVERIES = [
     items: 3,
     address: "Korunní 65, Prague 3, 13000",
     requestedWindow: "5:00 PM - 8:00 PM",
-    status: "ready_for_dispatch",
+    status: "ready_for_dispatch" as PendingDeliveryStatus,
     priority: "normal"
   }
 ];
@@ -126,7 +133,7 @@ const MOCK_PREPARING_DELIVERIES = [
     items: 2,
     address: "Nádražní 45, Prague 5, 15000",
     requestedWindow: "5:00 PM - 8:00 PM",
-    status: "picking",
+    status: "picking" as PreparingDeliveryStatus,
     estimatedReadyTime: "3:30 PM"
   },
   {
@@ -136,7 +143,7 @@ const MOCK_PREPARING_DELIVERIES = [
     items: 4,
     address: "Vratislavova 12, Prague 2, 12800",
     requestedWindow: "5:00 PM - 8:00 PM",
-    status: "packing",
+    status: "packing" as PreparingDeliveryStatus,
     estimatedReadyTime: "3:15 PM"
   },
   {
@@ -146,7 +153,7 @@ const MOCK_PREPARING_DELIVERIES = [
     items: 1,
     address: "Na Pankráci 86, Prague 4, 14000",
     requestedWindow: "6:00 PM - 9:00 PM",
-    status: "waiting",
+    status: "waiting" as PreparingDeliveryStatus,
     estimatedReadyTime: "4:00 PM"
   }
 ];
@@ -156,7 +163,7 @@ interface Driver {
   id: string;
   name: string;
   avatar: string;
-  status: "active" | "break" | "offline";
+  status: DriverStatus;
   availableUntil: string;
   currentLocation: string;
   completedToday: number;
@@ -174,7 +181,7 @@ interface PendingDelivery {
   items: number;
   address: string;
   requestedWindow: string;
-  status: "ready_for_dispatch";
+  status: PendingDeliveryStatus;
   priority: "normal" | "high";
   assignedDriver?: string;
 }
@@ -186,7 +193,7 @@ interface PreparingDelivery {
   items: number;
   address: string;
   requestedWindow: string;
-  status: "picking" | "packing" | "waiting";
+  status: PreparingDeliveryStatus;
   estimatedReadyTime: string;
 }
 
