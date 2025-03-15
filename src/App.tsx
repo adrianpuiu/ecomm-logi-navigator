@@ -29,27 +29,25 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <div className="flex min-h-screen">
+        <div className="relative min-h-screen">
           <Sidebar />
-          <div className="flex-1">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/shipments" element={<Shipments />} />
-              <Route path="/shipments/create" element={<CreateShipment />} />
-              <Route path="/shipment/:id" element={<Shipment />} />
-              <Route path="/carriers" element={<Carriers />} />
-              <Route path="/carrier/:id" element={<CarrierDetail />} />
-              <Route path="/carriers/new" element={<AddCarrier />} />
-              <Route path="/routes" element={<RoutePlanning />} />
-              <Route path="/returns" element={<ReturnsManagement />} />
-              <Route path="/returns/:id" element={<ReturnDetail />} />
-              <Route path="/customers" element={<Customers />} />
-              <Route path="/customers/:id" element={<CustomerDetail />} />
-              <Route path="/customers/new" element={<AddCustomer />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/shipments" element={<Shipments />} />
+            <Route path="/shipments/create" element={<CreateShipment />} />
+            <Route path="/shipment/:id" element={<Shipment />} />
+            <Route path="/carriers" element={<Carriers />} />
+            <Route path="/carrier/:id" element={<CarrierDetail />} />
+            <Route path="/carriers/new" element={<AddCarrier />} />
+            <Route path="/routes" element={<RoutePlanning />} />
+            <Route path="/returns" element={<ReturnsManagement />} />
+            <Route path="/returns/:id" element={<ReturnDetail />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/customers/:id" element={<CustomerDetail />} />
+            <Route path="/customers/new" element={<AddCustomer />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </div>
       </BrowserRouter>
     </TooltipProvider>

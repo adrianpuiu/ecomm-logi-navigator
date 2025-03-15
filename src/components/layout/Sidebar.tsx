@@ -25,9 +25,9 @@ export function Sidebar({ className }: SidebarProps) {
   const location = useLocation();
   
   return (
-    <div
+    <aside
       className={cn(
-        "fixed left-0 top-16 bottom-0 z-40 flex flex-col border-r bg-background transition-all duration-300",
+        "fixed left-0 top-0 bottom-0 z-40 flex flex-col border-r bg-background transition-all duration-300 pt-16",
         collapsed ? "w-[60px]" : "w-[240px]",
         className
       )}
@@ -107,7 +107,7 @@ export function Sidebar({ className }: SidebarProps) {
           {!collapsed && <span className="ml-2 text-sm">Collapse</span>}
         </button>
       </div>
-    </div>
+    </aside>
   );
 }
 
