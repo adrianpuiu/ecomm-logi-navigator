@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
-import { User } from "lucide-react";
+import { User, Settings, LogOut } from "lucide-react";
 
 export function UserMenu() {
   return (
@@ -24,10 +24,19 @@ export function UserMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>User</DropdownMenuLabel>
-        <DropdownMenuItem className="flex items-center" asChild>
-          <Link to="/profile">
+        <DropdownMenuItem asChild>
+          <Link to="/profile" className="flex items-center">
             <User className="mr-2 h-4 w-4" /> Profile
           </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/settings" className="flex items-center">
+            <Settings className="mr-2 h-4 w-4" /> Settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <LogOut className="mr-2 h-4 w-4" /> Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

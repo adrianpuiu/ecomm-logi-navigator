@@ -19,7 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         userRoles: [],
         isLoading: false,
         signIn: async () => {},
-        signUp: async () => {},
+        signUp: async () => ({ userId: undefined }),
         signOut: async () => {},
         hasRole,
         hasAnyRole,

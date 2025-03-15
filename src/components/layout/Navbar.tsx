@@ -11,6 +11,7 @@ import {
   Search 
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { UserMenu } from "@/components/auth/UserMenu";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -66,28 +67,28 @@ export function Navbar() {
                   <NavigationMenuTrigger className="bg-transparent">Shipments</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
-                      <NavItem href="/" title="Create New" icon={<Package className="h-4 w-4 mr-2" />}>
+                      <NavItem href="/shipments/create" title="Create New" icon={<Package className="h-4 w-4 mr-2" />}>
                         Start a new shipment workflow
                       </NavItem>
-                      <NavItem href="/" title="Active Shipments" icon={<Truck className="h-4 w-4 mr-2" />}>
+                      <NavItem href="/shipments" title="Active Shipments" icon={<Truck className="h-4 w-4 mr-2" />}>
                         View all shipments in progress
                       </NavItem>
                       <NavItem href="/" title="History" icon={<BarChart3 className="h-4 w-4 mr-2" />}>
                         Review past shipment data
                       </NavItem>
-                      <NavItem href="/" title="Returns" icon={<Package className="h-4 w-4 mr-2" />}>
+                      <NavItem href="/returns" title="Returns" icon={<Package className="h-4 w-4 mr-2" />}>
                         Manage return logistics
                       </NavItem>
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <Link to="/" className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
+                  <Link to="/carriers" className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
                     Carriers
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <Link to="/" className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
+                  <Link to="/analytics" className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
                     Analytics
                   </Link>
                 </NavigationMenuItem>
@@ -96,8 +97,8 @@ export function Navbar() {
           </div>
         </div>
         
-        <div className="hidden md:flex items-center gap-4">
-          <div className="relative w-64">
+        <div className="flex items-center gap-4">
+          <div className="relative w-64 hidden md:block">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input 
               type="search" 
@@ -105,12 +106,7 @@ export function Navbar() {
               className="w-full rounded-full pl-8 pr-4 bg-secondary/50" 
             />
           </div>
-          <Link 
-            to="/" 
-            className="rounded-full bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 text-sm font-medium transition-colors"
-          >
-            Help
-          </Link>
+          <UserMenu />
         </div>
       </div>
     </div>
