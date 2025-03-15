@@ -10,9 +10,7 @@ interface RoleGuardProps {
 
 export const RoleGuard: React.FC<RoleGuardProps> = ({
   children,
-  allowedRoles,
-  fallbackPath = "/auth/login",
 }) => {
-  // Auth is disabled, so we always render the children
+  // Always render the children with auth completely removed
   return <>{children}</>;
 };
