@@ -268,7 +268,7 @@ export function DeliveryAnalytics() {
                 <div className="h-full flex items-center justify-center text-muted-foreground">
                   Driver performance data visualization would appear here
                 </div>
-              </CardContent>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
