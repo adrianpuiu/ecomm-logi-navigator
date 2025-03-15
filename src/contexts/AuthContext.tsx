@@ -35,7 +35,8 @@ interface AuthContextProps {
   signOut: () => Promise<void>;
   hasRole: (role: TmsRole) => boolean;
   hasAnyRole: (roles: TmsRole[]) => boolean;
-  isAuthenticated: boolean; // Added to explicitly check authentication status
+  isAuthenticated: boolean; 
+  assignDefaultRole: (userId: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -100,16 +101,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         .eq('user_id', userId);
 
       if (error) {
-        // Check for infinite recursion error in RLS policy
-        if (error.code === "42P17" && error.message.includes("infinite recursion")) {
-          console.warn("RLS policy issue detected when fetching roles, applying fallback handling");
-          // Let's fallback to a default set of roles or an empty array
-          setUserRoles([]);
+        console.error('Error fetching user roles:', error);
+        // If no roles are found, assign a default one
+        if (error.code === 'PGRST116') {
+          await assignDefaultRole(userId);
         } else {
-          throw error;
+          // Check for infinite recursion error in RLS policy
+          if (error.code === "42P17" && error.message.includes("infinite recursion")) {
+            console.warn("RLS policy issue detected when fetching roles, applying fallback handling");
+            // Let's fallback to a default set of roles or an empty array
+            setUserRoles([]);
+          } else {
+            throw error;
+          }
         }
       } else if (data) {
-        setUserRoles(data.map((role: UserRoles) => role.role));
+        if (data.length === 0) {
+          // No roles found, assign a default one
+          await assignDefaultRole(userId);
+        } else {
+          setUserRoles(data.map((role: UserRoles) => role.role));
+        }
       }
     } catch (error) {
       console.error('Error fetching user roles:', error);
@@ -120,6 +132,65 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const assignDefaultRole = async (userId: string) => {
+    try {
+      // First, check if we need to create a default office
+      let officeId: string | null = null;
+      
+      const { data: officesData, error: officesError } = await supabase
+        .from('offices')
+        .select('id')
+        .limit(1);
+        
+      if (officesError) {
+        console.error('Error fetching offices:', officesError);
+      } else if (!officesData || officesData.length === 0) {
+        // No office exists, create a default one
+        const { data: newOffice, error: officeError } = await supabase
+          .from('offices')
+          .insert([{ name: 'Main Office', location: 'Headquarters' }])
+          .select();
+          
+        if (officeError) {
+          console.error('Error creating default office:', officeError);
+        } else if (newOffice && newOffice.length > 0) {
+          officeId = newOffice[0].id;
+        }
+      } else {
+        officeId = officesData[0].id;
+      }
+      
+      // Assign administrator role to the user
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .insert([{ 
+          user_id: userId, 
+          role: 'administrator',
+          office_id: officeId
+        }]);
+        
+      if (roleError) {
+        console.error('Error assigning default role:', roleError);
+        throw roleError;
+      }
+      
+      // Refresh user roles
+      await fetchUserRoles(userId);
+      
+      toast({
+        title: "Administrator Access Granted",
+        description: "You have been assigned as an administrator."
+      });
+    } catch (error) {
+      console.error('Error in assignDefaultRole:', error);
+      toast({
+        title: "Error",
+        description: "Failed to assign default role",
+        variant: "destructive",
+      });
     }
   };
 
@@ -147,12 +218,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signUp = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (error) throw error;
+      
+      // Assign a default role to the new user if we have a user ID
+      if (data?.user?.id) {
+        try {
+          await assignDefaultRole(data.user.id);
+        } catch (roleError) {
+          console.error('Error assigning default role during signup:', roleError);
+        }
+      }
       
       toast({
         title: "Registration Successful",
@@ -207,6 +287,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         hasRole,
         hasAnyRole,
         isAuthenticated,
+        assignDefaultRole,
       }}
     >
       {children}

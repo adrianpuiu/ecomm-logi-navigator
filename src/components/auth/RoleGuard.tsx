@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth, TmsRole } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
@@ -16,7 +16,20 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
   allowedRoles,
   fallbackPath = "/auth/login",
 }) => {
-  const { user, userRoles, isLoading, hasAnyRole, isAuthenticated } = useAuth();
+  const { user, userRoles, isLoading, hasAnyRole, isAuthenticated, assignDefaultRole } = useAuth();
+
+  // Attempt to assign default role if no roles are present
+  useEffect(() => {
+    const checkAndAssignRole = async () => {
+      if (user && userRoles.length === 0) {
+        await assignDefaultRole(user.id);
+      }
+    };
+    
+    if (user && !isLoading) {
+      checkAndAssignRole();
+    }
+  }, [user, userRoles, isLoading, assignDefaultRole]);
 
   if (isLoading) {
     return (

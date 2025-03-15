@@ -26,6 +26,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -48,6 +50,7 @@ export default function Auth() {
   const { user, signIn, signUp, isLoading } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>("login");
+  const { toast } = useToast();
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -77,7 +80,15 @@ export default function Auth() {
 
   const onRegisterSubmit = async (data: RegisterFormValues) => {
     try {
+      // Register the user
       await signUp(data.email, data.password);
+      
+      toast({
+        title: "Registration successful",
+        description: "Your account has been created. Please log in.",
+      });
+      
+      // Switch to the login tab
       setActiveTab("login");
     } catch (error) {
       console.error("Registration error:", error);
