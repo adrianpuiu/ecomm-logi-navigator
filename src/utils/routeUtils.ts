@@ -1,7 +1,7 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Route, RouteStop, RouteStatus, RouteConstraint, OptimizationPriority } from "@/types/route";
 import { toast } from "@/components/ui/use-toast";
+import { Json } from "@/integrations/supabase/types";
 
 /**
  * Saves a route to Supabase
@@ -21,7 +21,7 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
         driver_id: route.driver?.id,
         vehicle_id: route.vehicle?.id,
         optimization_priority: route.optimizationPriority,
-        constraints: route.constraints,
+        constraints: route.constraints as unknown as Json,
         status: route.status,
         distance: route.distance,
         duration: route.duration,
@@ -71,7 +71,7 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
       driver: route.driver,
       vehicle: route.vehicle,
       optimizationPriority: routeData.optimization_priority as OptimizationPriority,
-      constraints: routeData.constraints as RouteConstraint,
+      constraints: routeData.constraints as unknown as RouteConstraint,
       status: routeData.status as RouteStatus,
       distance: routeData.distance,
       duration: routeData.duration,
