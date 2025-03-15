@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -135,7 +136,14 @@ export function ShipmentsTable() {
                     animationFillMode: "forwards" 
                   }}
                 >
-                  <TableCell className="font-medium">{shipment.id}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link 
+                      to={`/shipment/${shipment.id}`}
+                      className="text-primary hover:underline"
+                    >
+                      {shipment.id}
+                    </Link>
+                  </TableCell>
                   <TableCell>
                     <div>
                       <div className="font-medium">{shipment.customer}</div>
@@ -162,9 +170,11 @@ export function ShipmentsTable() {
                       <DropdownMenuContent align="end" className="w-[160px]">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
+                        <DropdownMenuItem asChild>
+                          <Link to={`/shipment/${shipment.id}`} className="flex items-center cursor-pointer">
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Details
+                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <FileText className="h-4 w-4 mr-2" />
