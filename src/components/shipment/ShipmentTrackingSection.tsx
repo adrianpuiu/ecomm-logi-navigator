@@ -91,7 +91,7 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
     try {
       mapboxgl.accessToken = mapboxToken;
       
-      map.current = new mapboxgl.Map({
+      mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: 'mapbox://styles/mapbox/light-v11',
         center: [-95.7129, 37.0902], // Center of US
@@ -99,7 +99,7 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
         attributionControl: true
       });
       
-      map.current.addControl(
+      mapRef.current.addControl(
         new mapboxgl.NavigationControl({
           visualizePitch: true,
           showCompass: true,
@@ -108,9 +108,9 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
       );
       
       // Add terrain and sky layer for more visual appeal
-      map.current.on('style.load', () => {
+      mapRef.current.on('style.load', () => {
         // Add custom sky layer
-        map.current?.setFog({
+        mapRef.current?.setFog({
           color: 'rgb(255, 255, 255)',
           'high-color': 'rgb(200, 210, 255)',
           'horizon-blend': 0.1,
@@ -187,14 +187,14 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
           new mapboxgl.Marker(el)
             .setLngLat([lng, lat])
             .setPopup(popup)
-            .addTo(map.current!);
+            .addTo(mapRef.current!);
         }
       });
 
       // Draw route line between points
-      if (mockCoordinates.length >= 2 && map.current) {
-        map.current.on('load', () => {
-          map.current?.addSource('route', {
+      if (mockCoordinates.length >= 2 && mapRef.current) {
+        mapRef.current.on('load', () => {
+          mapRef.current?.addSource('route', {
             'type': 'geojson',
             'data': {
               'type': 'Feature',
@@ -207,7 +207,7 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
           });
           
           // Add animated line for routes
-          map.current?.addLayer({
+          mapRef.current?.addLayer({
             'id': 'route',
             'type': 'line',
             'source': 'route',
@@ -224,7 +224,7 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
           });
 
           // Add glow effect
-          map.current?.addLayer({
+          mapRef.current?.addLayer({
             'id': 'route-glow',
             'type': 'line',
             'source': 'route',
@@ -241,10 +241,10 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
 
           // Animated line dash
           let step = 0;
-          function animateDashArray(timestamp) {
+          function animateDashArray(timestamp: number) {
             // Update line-dasharray
             step = (step + 1) % 60;
-            map.current?.setPaintProperty('route', 'line-dasharray', [
+            mapRef.current?.setPaintProperty('route', 'line-dasharray', [
               0,
               4 + step/4,
               3,
@@ -260,12 +260,12 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
           mockCoordinates.forEach(coord => {
             bounds.extend(new mapboxgl.LngLat(coord[0], coord[1]));
           });
-          map.current?.fitBounds(bounds, { padding: 60 });
+          mapRef.current?.fitBounds(bounds, { padding: 60 });
         });
       }
 
       return () => {
-        map.current?.remove();
+        mapRef.current?.remove();
       };
     } catch (error) {
       console.error("Error initializing map:", error);
