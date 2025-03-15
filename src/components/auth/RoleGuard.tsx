@@ -1,9 +1,8 @@
 
 import React, { useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth, TmsRole } from "@/contexts/AuthContext";
+import { useAuth, TmsRole } from "@/contexts/auth";
 import { Loader2 } from "lucide-react";
-import { SidebarProvider, Sidebar } from "@/components/layout/Sidebar";
 
 interface RoleGuardProps {
   children: React.ReactNode;

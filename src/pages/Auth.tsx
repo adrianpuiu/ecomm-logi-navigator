@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Helmet } from "react-helmet";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -25,9 +24,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -80,7 +78,6 @@ export default function Auth() {
 
   const onRegisterSubmit = async (data: RegisterFormValues) => {
     try {
-      // Register the user
       await signUp(data.email, data.password);
       
       toast({
@@ -88,14 +85,12 @@ export default function Auth() {
         description: "Your account has been created. Please log in.",
       });
       
-      // Switch to the login tab
       setActiveTab("login");
     } catch (error) {
       console.error("Registration error:", error);
     }
   };
 
-  // Redirect if already authenticated
   if (user) {
     return <Navigate to="/" />;
   }
