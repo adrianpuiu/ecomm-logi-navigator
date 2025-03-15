@@ -4,10 +4,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
-import { Sidebar, SidebarProvider } from "@/components/layout/Sidebar";
 import { AuthProvider } from "@/contexts/auth/AuthProvider";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Navbar } from "@/components/layout/Navbar";
+import { NewSidebar } from "@/components/layout/NewSidebar";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -30,13 +30,13 @@ import UserProfile from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
 
-// Layout component with Sidebar
+// Layout component with the new Sidebar
 const Layout = () => (
-  <div className="flex min-h-screen">
-    <Sidebar />
-    <div className="flex-1 flex flex-col min-h-screen pt-16">
+  <div className="flex min-h-screen bg-background">
+    <NewSidebar />
+    <div className="flex-1 flex flex-col min-h-screen ml-[70px] md:ml-[240px]">
       <Navbar />
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-4 md:p-6">
         <Outlet />
       </div>
     </div>
@@ -50,35 +50,33 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <SidebarProvider>
-            <div className="relative min-h-screen">
-              <Routes>
-                {/* Unauthorized route */}
-                <Route path="/unauthorized" element={<Unauthorized />} />
-                
-                {/* Protected routes with layout */}
-                <Route element={<Layout />}>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/shipments" element={<Shipments />} />
-                  <Route path="/shipments/create" element={<CreateShipment />} />
-                  <Route path="/shipment/:id" element={<Shipment />} />
-                  <Route path="/carriers" element={<Carriers />} />
-                  <Route path="/carrier/:id" element={<CarrierDetail />} />
-                  <Route path="/carriers/new" element={<AddCarrier />} />
-                  <Route path="/routes" element={<RoutePlanning />} />
-                  <Route path="/returns" element={<ReturnsManagement />} />
-                  <Route path="/returns/:id" element={<ReturnDetail />} />
-                  <Route path="/customers" element={<Customers />} />
-                  <Route path="/customers/:id" element={<CustomerDetail />} />
-                  <Route path="/customers/new" element={<AddCustomer />} />
-                  <Route path="/analytics" element={<Analytics />} />
-                  <Route path="/same-day-delivery" element={<SameDayDelivery />} />
-                  <Route path="/profile" element={<UserProfile />} />
-                  <Route path="*" element={<NotFound />} />
-                </Route>
-              </Routes>
-            </div>
-          </SidebarProvider>
+          <div className="relative min-h-screen">
+            <Routes>
+              {/* Unauthorized route */}
+              <Route path="/unauthorized" element={<Unauthorized />} />
+              
+              {/* Protected routes with layout */}
+              <Route element={<Layout />}>
+                <Route path="/" element={<Index />} />
+                <Route path="/shipments" element={<Shipments />} />
+                <Route path="/shipments/create" element={<CreateShipment />} />
+                <Route path="/shipment/:id" element={<Shipment />} />
+                <Route path="/carriers" element={<Carriers />} />
+                <Route path="/carrier/:id" element={<CarrierDetail />} />
+                <Route path="/carriers/new" element={<AddCarrier />} />
+                <Route path="/routes" element={<RoutePlanning />} />
+                <Route path="/returns" element={<ReturnsManagement />} />
+                <Route path="/returns/:id" element={<ReturnDetail />} />
+                <Route path="/customers" element={<Customers />} />
+                <Route path="/customers/:id" element={<CustomerDetail />} />
+                <Route path="/customers/new" element={<AddCustomer />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/same-day-delivery" element={<SameDayDelivery />} />
+                <Route path="/profile" element={<UserProfile />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Routes>
+          </div>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
