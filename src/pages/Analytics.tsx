@@ -1,15 +1,18 @@
 
-import { Helmet } from 'react-helmet';
-import { useState } from 'react';
-import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
-import { AnalyticsReports } from '@/components/analytics/AnalyticsReports';
-import { AnalyticsSettings } from '@/components/analytics/AnalyticsSettings';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { KpiCardsRow } from '@/components/analytics/KpiCardsRow';
-import { Button } from '@/components/ui/button';
-import { Calendar, FileText, LayoutDashboard, Settings } from 'lucide-react';
-import { DateRangePicker } from '@/components/analytics/DateRangePicker';
-import { DateRange } from 'react-day-picker';
+import { useState } from "react";
+import { Helmet } from "react-helmet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { DateRange } from "react-day-picker";
+import { DateRangePicker } from "@/components/analytics/DateRangePicker";
+import { FileText } from "lucide-react";
+import { KpiCardsRow } from "@/components/analytics/KpiCardsRow";
+import { ShipmentVolumeChart } from "@/components/analytics/charts/ShipmentVolumeChart";
+import { DeliveryTimeDistribution } from "@/components/analytics/charts/DeliveryTimeDistribution";
+import { CarrierPerformanceChart } from "@/components/analytics/charts/CarrierPerformanceChart";
+import { CostBreakdownChart } from "@/components/analytics/charts/CostBreakdownChart";
+import { ShipmentsByRegionMap } from "@/components/analytics/charts/ShipmentsByRegionMap";
+import { ReturnRateChart } from "@/components/analytics/charts/ReturnRateChart";
 
 export default function Analytics() {
   // Update the state type to match DateRange from react-day-picker
@@ -26,17 +29,16 @@ export default function Analytics() {
   return (
     <>
       <Helmet>
-        <title>Analytics & Reporting | Logistics TMS</title>
+        <title>Analytics | LogiNav</title>
       </Helmet>
 
       <div className="ml-[240px] flex flex-col min-h-screen bg-background p-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Analytics & Reporting</h1>
-            <p className="text-muted-foreground mt-1">
-              Monitor key metrics and generate reports for your logistics operations
-            </p>
+            <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
+            <p className="text-muted-foreground">Track and analyze your logistics performance</p>
           </div>
+          
           <div className="flex items-center gap-3">
             <DateRangePicker 
               dateRange={dateRange}
@@ -44,41 +46,44 @@ export default function Analytics() {
             />
             <Button>
               <FileText className="mr-2 h-4 w-4" />
-              Export Dashboard
+              Export
             </Button>
           </div>
         </div>
         
         <KpiCardsRow dateRange={dateRange} />
         
-        <Tabs defaultValue="dashboard" className="mt-6">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="dashboard" className="flex items-center">
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              Dashboard
-            </TabsTrigger>
-            <TabsTrigger value="reports" className="flex items-center">
-              <FileText className="mr-2 h-4 w-4" />
-              Reports
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center">
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="dashboard" className="pt-4">
-            <AnalyticsDashboard dateRange={dateRange} />
-          </TabsContent>
-          
-          <TabsContent value="reports" className="pt-4">
-            <AnalyticsReports dateRange={dateRange} />
-          </TabsContent>
-          
-          <TabsContent value="settings" className="pt-4">
-            <AnalyticsSettings />
-          </TabsContent>
-        </Tabs>
+        <div className="mt-6">
+          <Tabs defaultValue="overview" className="space-y-4">
+            <TabsList>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="shipments">Shipments</TabsTrigger>
+              <TabsTrigger value="carriers">Carriers</TabsTrigger>
+              <TabsTrigger value="costs">Costs</TabsTrigger>
+              <TabsTrigger value="returns">Returns</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ShipmentVolumeChart />
+                <DeliveryTimeDistribution />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CarrierPerformanceChart />
+                <CostBreakdownChart />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ShipmentsByRegionMap dateRange={dateRange} />
+                <ReturnRateChart />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="shipments">Shipment analytics content</TabsContent>
+            <TabsContent value="carriers">Carrier analytics content</TabsContent>
+            <TabsContent value="costs">Cost analytics content</TabsContent>
+            <TabsContent value="returns">Returns analytics content</TabsContent>
+          </Tabs>
+        </div>
       </div>
     </>
   );
