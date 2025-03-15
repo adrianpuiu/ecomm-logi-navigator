@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { MapPin, Route, Navigation, AlertTriangle, Layers } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -11,9 +12,10 @@ import { RouteStop } from "@/types/route";
 interface MapProps {
   stops?: RouteStop[];
   onAddStop?: (stop: RouteStop) => void;
+  onRouteCalculated?: (distance: number, duration: number) => void;
 }
 
-export function Map({ stops = [], onAddStop }: MapProps) {
+export function Map({ stops = [], onAddStop, onRouteCalculated }: MapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState<string | null>(localStorage.getItem("mapbox_token"));
@@ -153,8 +155,10 @@ export function Map({ stops = [], onAddStop }: MapProps) {
       if (map.getLayer('route')) map.removeLayer('route');
       if (map.getSource('route')) map.removeSource('route');
       
+      // Validate coordinates to ensure they are valid [lng, lat] pairs
       const validCoordinates = coordinates.filter(
-        coord => Array.isArray(coord) && coord.length === 2
+        coord => Array.isArray(coord) && coord.length === 2 && 
+        !isNaN(coord[0]) && !isNaN(coord[1])
       ) as [number, number][];
       
       if (validCoordinates.length < 2) {
@@ -186,6 +190,13 @@ export function Map({ stops = [], onAddStop }: MapProps) {
       }
       
       const route = data.routes[0].geometry;
+      const distance = data.routes[0].distance; // Distance in meters
+      const duration = data.routes[0].duration; // Duration in seconds
+      
+      // Call the callback with route metrics if provided
+      if (onRouteCalculated) {
+        onRouteCalculated(distance, duration);
+      }
       
       map.addSource('route', {
         type: 'geojson',

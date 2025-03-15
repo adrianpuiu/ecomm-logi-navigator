@@ -10,12 +10,34 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { RouteStop } from "@/types/route";
+import { RouteStop, OptimizationPriority, RouteConstraint, Driver, Vehicle } from "@/types/route";
+import { saveRoute, validateRouteData } from "@/utils/routeUtils";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 export default function Routes() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("plan");
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [routeName, setRouteName] = useState("");
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [optimizationPriority, setOptimizationPriority] = useState<OptimizationPriority>("fastest");
+  const [routeConstraints, setRouteConstraints] = useState<RouteConstraint>({
+    avoidTolls: false,
+    avoidHighways: false,
+    useRealTimeTraffic: true,
+    allowUTurns: false,
+  });
+  const [deliveryDate, setDeliveryDate] = useState<string>("");
+  const [timeWindowStart, setTimeWindowStart] = useState<string>("");
+  const [timeWindowEnd, setTimeWindowEnd] = useState<string>("");
+  const [routeDistance, setRouteDistance] = useState<number>(0);
+  const [routeDuration, setRouteDuration] = useState<number>(0);
+  
   const [stops, setStops] = useState<RouteStop[]>([
     { 
       id: "origin", 
@@ -106,11 +128,92 @@ export default function Routes() {
     }, 2000);
   };
   
-  const handleSaveRoute = () => {
-    toast({
-      title: "Route Saved",
-      description: "Your route has been saved successfully.",
-    });
+  const handleSaveRoute = async () => {
+    // Show the save dialog to collect the route name
+    setShowSaveDialog(true);
+  };
+  
+  const handleConfirmSave = async () => {
+    setIsSaving(true);
+    
+    const validation = validateRouteData(stops, routeName);
+    if (!validation.isValid) {
+      toast({
+        title: "Cannot Save Route",
+        description: validation.message,
+        variant: "destructive"
+      });
+      setIsSaving(false);
+      return;
+    }
+    
+    // Calculate dates from string inputs
+    let timeWindow = undefined;
+    if (deliveryDate && (timeWindowStart || timeWindowEnd)) {
+      const dateBase = new Date(deliveryDate);
+      timeWindow = {
+        start: timeWindowStart 
+          ? new Date(`${deliveryDate}T${timeWindowStart}`) 
+          : dateBase,
+        end: timeWindowEnd 
+          ? new Date(`${deliveryDate}T${timeWindowEnd}`) 
+          : dateBase,
+      };
+    }
+    
+    // Construct the route object
+    const route = {
+      name: routeName,
+      date: deliveryDate ? new Date(deliveryDate) : new Date(),
+      timeWindow,
+      stops,
+      driver: selectedDriver,
+      vehicle: selectedVehicle,
+      optimizationPriority,
+      constraints: routeConstraints,
+      status: "planned",
+      distance: routeDistance,
+      duration: routeDuration,
+      estimatedCost: calculateEstimatedCost(routeDistance, routeDuration),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    const savedRoute = await saveRoute(route);
+    
+    if (savedRoute) {
+      toast({
+        title: "Route Saved",
+        description: `"${routeName}" has been saved successfully.`,
+      });
+      setShowSaveDialog(false);
+      // Optionally reset the form or redirect to the saved route
+    } else {
+      toast({
+        title: "Error Saving Route",
+        description: "There was a problem saving your route. Please try again.",
+        variant: "destructive"
+      });
+    }
+    
+    setIsSaving(false);
+  };
+  
+  const calculateEstimatedCost = (distance: number, duration: number): number => {
+    // Basic cost calculation logic
+    const baseRate = 1.5; // $ per mile
+    const timeRate = 30; // $ per hour
+    
+    const distanceCost = (distance / 1000) * baseRate; // Convert meters to km
+    const timeCost = (duration / 3600) * timeRate; // Convert seconds to hours
+    
+    return Math.round((distanceCost + timeCost) * 100) / 100; // Round to 2 decimal places
+  };
+  
+  // Update route metrics when the map calculates them
+  const handleRouteCalculated = (distance: number, duration: number) => {
+    setRouteDistance(distance);
+    setRouteDuration(duration);
   };
 
   return (
@@ -157,7 +260,8 @@ export default function Routes() {
                       <CardContent className="p-0">
                         <Map 
                           stops={stops} 
-                          onAddStop={handleAddStop} 
+                          onAddStop={handleAddStop}
+                          onRouteCalculated={handleRouteCalculated}
                         />
                       </CardContent>
                     </Card>
@@ -169,12 +273,46 @@ export default function Routes() {
                       onUpdateStop={handleUpdateStop}
                       onRemoveStop={handleRemoveStop}
                       onAddStop={handleAddStop}
+                      deliveryDate={deliveryDate}
+                      setDeliveryDate={setDeliveryDate}
+                      timeWindowStart={timeWindowStart}
+                      setTimeWindowStart={setTimeWindowStart}
+                      timeWindowEnd={timeWindowEnd}
+                      setTimeWindowEnd={setTimeWindowEnd}
                     />
-                    <RouteOptimizationOptions />
+                    <RouteOptimizationOptions 
+                      optimizationPriority={optimizationPriority}
+                      setOptimizationPriority={setOptimizationPriority}
+                      routeConstraints={routeConstraints}
+                      setRouteConstraints={setRouteConstraints}
+                    />
                     <div className="grid grid-cols-2 gap-4">
-                      <DriverSelector />
-                      <VehicleSelector />
+                      <DriverSelector onSelectDriver={setSelectedDriver} />
+                      <VehicleSelector onSelectVehicle={setSelectedVehicle} />
                     </div>
+                    
+                    {/* Route Summary Card */}
+                    {routeDistance > 0 && (
+                      <Card>
+                        <CardContent className="pt-4">
+                          <h3 className="text-lg font-semibold mb-2">Route Summary</h3>
+                          <div className="space-y-2">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Distance:</span>
+                              <span className="font-medium">{(routeDistance / 1000).toFixed(1)} km</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Duration:</span>
+                              <span className="font-medium">{Math.floor(routeDuration / 3600)}h {Math.floor((routeDuration % 3600) / 60)}m</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Estimated Cost:</span>
+                              <span className="font-medium">${calculateEstimatedCost(routeDistance, routeDuration)}</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
                   </div>
                 </div>
               </TabsContent>
@@ -198,6 +336,54 @@ export default function Routes() {
           </div>
         </div>
       </div>
+      
+      {/* Save Route Dialog */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Route</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="route-name">Route Name</Label>
+              <Input 
+                id="route-name" 
+                placeholder="Enter a name for this route" 
+                value={routeName}
+                onChange={(e) => setRouteName(e.target.value)}
+              />
+            </div>
+            
+            {routeDistance > 0 && (
+              <div className="space-y-2 border rounded-md p-3 bg-muted/20">
+                <h4 className="font-medium">Route Summary</h4>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                  <span className="text-muted-foreground">Distance:</span>
+                  <span>{(routeDistance / 1000).toFixed(1)} km</span>
+                  
+                  <span className="text-muted-foreground">Duration:</span>
+                  <span>{Math.floor(routeDuration / 3600)}h {Math.floor((routeDuration % 3600) / 60)}m</span>
+                  
+                  <span className="text-muted-foreground">Stops:</span>
+                  <span>{stops.length}</span>
+                  
+                  <span className="text-muted-foreground">Estimated Cost:</span>
+                  <span>${calculateEstimatedCost(routeDistance, routeDuration)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>Cancel</Button>
+            <Button 
+              onClick={handleConfirmSave} 
+              disabled={!routeName.trim() || isSaving}
+            >
+              {isSaving ? "Saving..." : "Save Route"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

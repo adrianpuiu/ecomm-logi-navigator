@@ -12,13 +12,27 @@ interface RouteParametersProps {
   onUpdateStop: (id: string, stop: Partial<RouteStop>) => void;
   onRemoveStop: (id: string) => void;
   onAddStop: (stop: RouteStop) => void;
+  deliveryDate?: string;
+  setDeliveryDate?: (date: string) => void;
+  timeWindowStart?: string;
+  setTimeWindowStart?: (time: string) => void;
+  timeWindowEnd?: string;
+  setTimeWindowEnd?: (time: string) => void;
 }
 
-export function RouteParameters({ stops, onUpdateStop, onRemoveStop, onAddStop }: RouteParametersProps) {
+export function RouteParameters({ 
+  stops, 
+  onUpdateStop, 
+  onRemoveStop, 
+  onAddStop,
+  deliveryDate = "",
+  setDeliveryDate = () => {},
+  timeWindowStart = "",
+  setTimeWindowStart = () => {},
+  timeWindowEnd = "",
+  setTimeWindowEnd = () => {},
+}: RouteParametersProps) {
   const { toast } = useToast();
-  const [deliveryDate, setDeliveryDate] = useState<string>("");
-  const [timeWindowStart, setTimeWindowStart] = useState<string>("");
-  const [timeWindowEnd, setTimeWindowEnd] = useState<string>("");
 
   const addWaypoint = () => {
     const newStop: RouteStop = {
