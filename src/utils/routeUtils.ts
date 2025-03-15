@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Route, RouteStop, RouteStatus, RouteConstraint, OptimizationPriority } from "@/types/route";
 import { toast } from "@/components/ui/use-toast";
@@ -13,7 +14,7 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
     // First save the main route
     const { data: routeData, error: routeError } = await supabase
       .from('routes')
-      .insert({
+      .insert([{  // Wrap the object in an array
         name: route.name,
         date: route.date?.toISOString(),
         time_window_start: route.timeWindow?.start?.toISOString(),
@@ -26,7 +27,7 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
         distance: route.distance,
         duration: route.duration,
         estimated_cost: route.estimatedCost,
-      })
+      }])
       .select()
       .single();
 
