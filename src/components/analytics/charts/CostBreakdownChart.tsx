@@ -9,8 +9,8 @@ import {
   Legend 
 } from "recharts";
 
-interface CostBreakdownChartProps {
-  dateRange: DateRange;
+export interface CostBreakdownChartProps {
+  dateRange: DateRange | undefined;
 }
 
 export function CostBreakdownChart({ dateRange }: CostBreakdownChartProps) {

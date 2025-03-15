@@ -12,8 +12,8 @@ import {
   Legend 
 } from "recharts";
 
-interface ShipmentVolumeChartProps {
-  dateRange: DateRange;
+export interface ShipmentVolumeChartProps {
+  dateRange: DateRange | undefined;
 }
 
 export function ShipmentVolumeChart({ dateRange }: ShipmentVolumeChartProps) {

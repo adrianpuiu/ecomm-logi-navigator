@@ -9,8 +9,8 @@ import {
   Legend 
 } from "recharts";
 
-interface DeliveryTimeDistributionProps {
-  dateRange: DateRange;
+export interface DeliveryTimeDistributionProps {
+  dateRange: DateRange | undefined;
 }
 
 export function DeliveryTimeDistribution({ dateRange }: DeliveryTimeDistributionProps) {

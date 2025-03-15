@@ -13,8 +13,8 @@ import {
   Cell
 } from "recharts";
 
-interface CarrierPerformanceChartProps {
-  dateRange: DateRange;
+export interface CarrierPerformanceChartProps {
+  dateRange: DateRange | undefined;
 }
 
 export function CarrierPerformanceChart({ dateRange }: CarrierPerformanceChartProps) {

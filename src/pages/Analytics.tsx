@@ -65,16 +65,16 @@ export default function Analytics() {
             
             <TabsContent value="overview" className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ShipmentVolumeChart />
-                <DeliveryTimeDistribution />
+                <ShipmentVolumeChart dateRange={dateRange} />
+                <DeliveryTimeDistribution dateRange={dateRange} />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <CarrierPerformanceChart />
-                <CostBreakdownChart />
+                <CarrierPerformanceChart dateRange={dateRange} />
+                <CostBreakdownChart dateRange={dateRange} />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <ShipmentsByRegionMap dateRange={dateRange} />
-                <ReturnRateChart />
+                <ReturnRateChart dateRange={dateRange} />
               </div>
             </TabsContent>
             

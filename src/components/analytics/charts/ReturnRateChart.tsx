@@ -12,8 +12,8 @@ import {
   ReferenceLine
 } from "recharts";
 
-interface ReturnRateChartProps {
-  dateRange: DateRange;
+export interface ReturnRateChartProps {
+  dateRange: DateRange | undefined;
 }
 
 export function ReturnRateChart({ dateRange }: ReturnRateChartProps) {
