@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Route, RouteStop, RouteStatus, RouteConstraint, OptimizationPriority, Driver, Vehicle } from "@/types/route";
+import { Route, RouteStop, RouteStatus, RouteConstraint, OptimizationPriority, Driver, Vehicle, VehicleType } from "@/types/route";
 import { toast } from "@/components/ui/use-toast";
 import { Json } from "@/integrations/supabase/types";
 
@@ -79,7 +79,7 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
     }
 
     // Format the data to match our Route type
-    const savedRoute: Route = {
+    const savedRoute = {
       id: routeData.id,
       name: routeData.name,
       date: new Date(routeData.date),
@@ -98,7 +98,7 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
       estimatedCost: routeData.estimated_cost,
       createdAt: new Date(routeData.created_at),
       updatedAt: new Date(routeData.updated_at)
-    };
+    } as Route;
 
     toast({
       title: "Route saved successfully",
@@ -248,7 +248,8 @@ export const fetchRoutes = async (filter?: {
     if (filter) {
       if (filter.driverName) {
         // This assumes there's a column called 'name' in the drivers table
-        query = query.filter('drivers.name', 'ilike', `%${filter.driverName}%`);
+        query = query.filter('drivers.first_name', 'ilike', `%${filter.driverName}%`)
+          .or(`drivers.last_name.ilike.%${filter.driverName}%`);
       }
       
       if (filter.dateFrom) {
@@ -270,6 +271,37 @@ export const fetchRoutes = async (filter?: {
     
     // Transform the data to match our Route type
     const routes = data.map(item => {
+      // Create a properly formatted driver object that matches our Driver type
+      const driver = item.drivers ? {
+        id: item.drivers.id,
+        name: `${item.drivers.first_name} ${item.drivers.last_name}`.trim(),
+        email: item.drivers.email || '',
+        phone: item.drivers.phone || '',
+        license: item.drivers.license_number || '',
+        certifications: [],
+        available: item.drivers.status === 'available',
+        maxHours: 8, // Default values since these don't exist in the DB
+        currentHours: 0,
+        location: undefined
+      } as Driver : undefined;
+      
+      // Create a properly formatted vehicle object that matches our Vehicle type
+      const vehicle = item.vehicles ? {
+        id: item.vehicles.id,
+        name: item.vehicles.name,
+        type: item.vehicles.type as VehicleType,
+        licensePlate: item.vehicles.license_plate,
+        capacity: {
+          weight: item.vehicles.capacity || 0,
+          volume: 0,
+          pallets: 0
+        },
+        available: item.vehicles.status === 'available',
+        fuelEfficiency: 0,
+        currentLocation: undefined,
+        features: []
+      } as Vehicle : undefined;
+
       return {
         id: item.id,
         name: item.name,
@@ -288,8 +320,8 @@ export const fetchRoutes = async (filter?: {
           arrivalTime: stop.arrival_time ? new Date(stop.arrival_time) : undefined,
           departureTime: stop.departure_time ? new Date(stop.departure_time) : undefined,
         })),
-        driver: item.drivers,
-        vehicle: item.vehicles,
+        driver: driver,
+        vehicle: vehicle,
         optimizationPriority: item.optimization_priority as OptimizationPriority,
         constraints: item.constraints as RouteConstraint,
         status: item.status as RouteStatus,
@@ -327,14 +359,17 @@ export const fetchDrivers = async (): Promise<Driver[]> => {
     
     return data.map((driver: any) => ({
       id: driver.id,
-      name: driver.name,
-      email: driver.email,
-      phone: driver.phone,
-      licenseNumber: driver.license_number,
+      name: `${driver.first_name} ${driver.last_name}`.trim(),
+      email: driver.email || '',
+      phone: driver.phone || '',
+      license: driver.license_number || '',
       licenseExpiry: driver.license_expiry ? new Date(driver.license_expiry) : undefined,
-      certifications: driver.certifications || [],
-      status: driver.status,
-    }));
+      certifications: [],
+      available: driver.status === 'available',
+      maxHours: 8, // Default values since these don't exist in the DB
+      currentHours: 0,
+      location: undefined
+    })) as Driver[];
   } catch (error) {
     console.error('Error fetching drivers:', error);
     return [];
@@ -356,16 +391,18 @@ export const fetchVehicles = async (): Promise<Vehicle[]> => {
     return data.map((vehicle: any) => ({
       id: vehicle.id,
       name: vehicle.name,
-      type: vehicle.type,
+      type: vehicle.type as VehicleType,
       licensePlate: vehicle.license_plate,
       capacity: {
-        weight: vehicle.capacity_weight,
-        volume: vehicle.capacity_volume,
-        pallets: vehicle.capacity_pallets,
+        weight: vehicle.capacity || 0,
+        volume: 0,
+        pallets: 0
       },
-      features: vehicle.features || [],
-      status: vehicle.status,
-    }));
+      available: vehicle.status === 'available',
+      fuelEfficiency: 0,
+      currentLocation: undefined,
+      features: []
+    })) as Vehicle[];
   } catch (error) {
     console.error('Error fetching vehicles:', error);
     return [];
