@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Shipment from "./pages/Shipment";
+import Shipments from "./pages/Shipments";
+import CreateShipment from "./pages/CreateShipment";
 import Carriers from "./pages/Carriers";
 import CarrierDetail from "./pages/CarrierDetail";
 import AddCarrier from "./pages/AddCarrier";
@@ -21,6 +23,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/shipments" element={<Shipments />} />
+          <Route path="/shipments/create" element={<CreateShipment />} />
           <Route path="/shipment/:id" element={<Shipment />} />
           <Route path="/carriers" element={<Carriers />} />
           <Route path="/carrier/:id" element={<CarrierDetail />} />

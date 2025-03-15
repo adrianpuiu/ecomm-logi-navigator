@@ -44,14 +44,14 @@ export function Sidebar({ className }: SidebarProps) {
           icon={<Package size={20} />} 
           label="Shipments" 
           to="/shipments" 
-          active={location.pathname.startsWith("/shipments")} 
+          active={location.pathname.startsWith("/shipment")} 
           collapsed={collapsed}
         />
         <SidebarItem 
           icon={<Truck size={20} />} 
           label="Carriers" 
           to="/carriers" 
-          active={location.pathname.startsWith("/carriers")} 
+          active={location.pathname.startsWith("/carrier")} 
           collapsed={collapsed}
         />
         <SidebarItem 
