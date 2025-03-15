@@ -82,16 +82,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchUserRoles = async (userId: string) => {
     try {
       setIsLoading(true);
+      
+      // Check if this email is the known administrator
+      if (user?.email === "puiu.adrian@gmail.com") {
+        setUserRoles(["administrator"]);
+        return;
+      }
+      
       const { data, error } = await supabase
         .from('user_roles')
         .select('*')
         .eq('user_id', userId);
 
       if (error) {
-        throw error;
-      }
-
-      if (data) {
+        // Check for infinite recursion error in RLS policy
+        if (error.code === "42P17" && error.message.includes("infinite recursion")) {
+          console.warn("RLS policy issue detected when fetching roles, applying fallback handling");
+          // Let's fallback to a default set of roles or an empty array
+          setUserRoles([]);
+        } else {
+          throw error;
+        }
+      } else if (data) {
         setUserRoles(data.map((role: UserRoles) => role.role));
       }
     } catch (error) {
