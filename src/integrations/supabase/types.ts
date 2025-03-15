@@ -107,6 +107,122 @@ export type Database = {
         }
         Relationships: []
       }
+      route_stops: {
+        Row: {
+          address: string
+          arrival_time: string | null
+          created_at: string
+          departure_time: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          order_index: number
+          route_id: string
+          type: string
+        }
+        Insert: {
+          address: string
+          arrival_time?: string | null
+          created_at?: string
+          departure_time?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          order_index: number
+          route_id: string
+          type: string
+        }
+        Update: {
+          address?: string
+          arrival_time?: string | null
+          created_at?: string
+          departure_time?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          order_index?: number
+          route_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "route_stops_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "routes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      routes: {
+        Row: {
+          constraints: Json
+          created_at: string
+          date: string
+          distance: number
+          driver_id: string | null
+          duration: number
+          estimated_cost: number
+          id: string
+          name: string
+          optimization_priority: string
+          status: string
+          time_window_end: string | null
+          time_window_start: string | null
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          constraints?: Json
+          created_at?: string
+          date: string
+          distance?: number
+          driver_id?: string | null
+          duration?: number
+          estimated_cost?: number
+          id?: string
+          name: string
+          optimization_priority: string
+          status: string
+          time_window_end?: string | null
+          time_window_start?: string | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          constraints?: Json
+          created_at?: string
+          date?: string
+          distance?: number
+          driver_id?: string | null
+          duration?: number
+          estimated_cost?: number
+          id?: string
+          name?: string
+          optimization_priority?: string
+          status?: string
+          time_window_end?: string | null
+          time_window_start?: string | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routes_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "routes_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_pages: {
         Row: {
           chunk_number: number

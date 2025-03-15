@@ -22,7 +22,7 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
         vehicle_id: route.vehicle?.id,
         optimization_priority: route.optimizationPriority,
         constraints: route.constraints,
-        status: route.status || 'planned',
+        status: route.status,
         distance: route.distance,
         duration: route.duration,
         estimated_cost: route.estimatedCost,

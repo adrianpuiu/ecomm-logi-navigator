@@ -1,5 +1,4 @@
 
-
 export type OptimizationPriority = "fastest" | "shortest" | "cost";
 
 export type RouteConstraint = {
@@ -78,4 +77,3 @@ export type Route = {
   createdAt?: Date;
   updatedAt?: Date;
 };
-

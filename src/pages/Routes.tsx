@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Helmet } from "react-helmet";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -10,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { RouteStop, OptimizationPriority, RouteConstraint, Driver, Vehicle } from "@/types/route";
+import { RouteStop, OptimizationPriority, RouteConstraint, Driver, Vehicle, Route, RouteStatus } from "@/types/route";
 import { saveRoute, validateRouteData } from "@/utils/routeUtils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -162,7 +163,7 @@ export default function Routes() {
     }
     
     // Construct the route object
-    const route: Partial<Route> = {
+    const routeToSave: Partial<Route> = {
       name: routeName,
       date: deliveryDate ? new Date(deliveryDate) : new Date(),
       timeWindow,
@@ -177,7 +178,7 @@ export default function Routes() {
       estimatedCost: calculateEstimatedCost(routeDistance, routeDuration),
     };
     
-    const savedRoute = await saveRoute(route);
+    const savedRoute = await saveRoute(routeToSave);
     
     if (savedRoute) {
       toast({
