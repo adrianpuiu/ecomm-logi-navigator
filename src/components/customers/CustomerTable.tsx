@@ -148,7 +148,7 @@ export function CustomerTable({ searchTerm, selectedSegment }: CustomerTableProp
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>{formatDate(new Date(customer.registrationDate))}</TableCell>
+                <TableCell>{formatDate(customer.registrationDate)}</TableCell>
                 <TableCell>
                   <div className="flex flex-col space-y-1">
                     <span className="text-sm">{customer.orderCount} orders</span>

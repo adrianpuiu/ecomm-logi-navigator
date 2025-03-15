@@ -110,7 +110,7 @@ export function CustomerOrderHistory({ customerId }: CustomerOrderHistoryProps) 
               mockOrders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell className="font-medium">{order.orderNumber}</TableCell>
-                  <TableCell>{formatDate(new Date(order.date))}</TableCell>
+                  <TableCell>{formatDate(order.date)}</TableCell>
                   <TableCell>{getStatusBadge(order.status)}</TableCell>
                   <TableCell>{order.items}</TableCell>
                   <TableCell>${order.total.toFixed(2)}</TableCell>

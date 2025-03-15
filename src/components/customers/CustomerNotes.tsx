@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { FileText, Plus, User } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
@@ -111,7 +111,7 @@ export function CustomerNotes({ customerId }: CustomerNotesProps) {
                   <User className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm font-medium">{note.createdBy}</span>
                   <span className="text-xs text-muted-foreground">
-                    {formatDate(new Date(note.createdAt), "PPpp")}
+                    {formatDate(note.createdAt)}
                   </span>
                 </div>
               </CardHeader>

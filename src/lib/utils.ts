@@ -6,11 +6,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatDate(dateString: string): string {
-  if (!dateString) return "N/A";
+export function formatDate(input: string | Date): string {
+  if (!input) return "N/A";
   
   try {
-    const date = new Date(dateString);
+    const date = input instanceof Date ? input : new Date(input);
+    
+    if (isNaN(date.getTime())) {
+      return "Invalid Date";
+    }
+    
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'short',
@@ -21,6 +26,6 @@ export function formatDate(dateString: string): string {
     }).format(date);
   } catch (error) {
     console.error("Error formatting date:", error);
-    return dateString;
+    return "Invalid Date";
   }
 }

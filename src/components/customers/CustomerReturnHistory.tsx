@@ -107,7 +107,7 @@ export function CustomerReturnHistory({ customerId }: CustomerReturnHistoryProps
               mockReturns.map((returnItem) => (
                 <TableRow key={returnItem.id}>
                   <TableCell className="font-medium">{returnItem.returnNumber}</TableCell>
-                  <TableCell>{formatDate(new Date(returnItem.date))}</TableCell>
+                  <TableCell>{formatDate(returnItem.date)}</TableCell>
                   <TableCell>{getStatusBadge(returnItem.status)}</TableCell>
                   <TableCell>{returnItem.items}</TableCell>
                   <TableCell>${returnItem.refundAmount.toFixed(2)}</TableCell>

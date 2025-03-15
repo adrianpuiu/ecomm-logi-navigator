@@ -91,7 +91,7 @@ export function CustomerDetails({ customer }: CustomerDetailsProps) {
             </div>
             <div>
               <p className="font-medium">{customer.firstName} {customer.lastName}</p>
-              <p className="text-sm text-muted-foreground">Customer since {formatDate(new Date(customer.registrationDate))}</p>
+              <p className="text-sm text-muted-foreground">Customer since {formatDate(customer.registrationDate)}</p>
             </div>
           </div>
           
@@ -111,7 +111,7 @@ export function CustomerDetails({ customer }: CustomerDetailsProps) {
             </div>
             <div className="flex items-center space-x-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              <p className="text-sm">Registered on {formatDate(new Date(customer.registrationDate))}</p>
+              <p className="text-sm">Registered on {formatDate(customer.registrationDate)}</p>
             </div>
           </div>
           

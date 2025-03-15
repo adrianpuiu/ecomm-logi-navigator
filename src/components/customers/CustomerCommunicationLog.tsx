@@ -123,7 +123,7 @@ export function CustomerCommunicationLog({ customerId }: CustomerCommunicationLo
                     </div>
                   </TableCell>
                   <TableCell>
-                    {formatDate(new Date(comm.date), "PPpp")}
+                    {formatDate(comm.date)}
                   </TableCell>
                   <TableCell>
                     {getDirectionBadge(comm.direction)}
