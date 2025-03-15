@@ -4,10 +4,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
 import { RouteStop, RouteConstraint, OptimizationPriority, Driver, Vehicle } from "@/types/route";
-import { saveRoute } from "@/utils/routeUtils";
-import { Loader2 } from "lucide-react";
+import { saveRoute, validateRouteData } from "@/utils/routeUtils";
+import { Loader2, AlertTriangle } from "lucide-react";
 
 interface SaveRouteDialogProps {
   open: boolean;
@@ -34,6 +35,9 @@ export function SaveRouteDialog({
   const [routeName, setRouteName] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
+  
+  // Check if the route data is valid
+  const validation = validateRouteData(routeData.stops, routeName);
   
   const handleSave = async () => {
     setIsSaving(true);
@@ -104,6 +108,13 @@ export function SaveRouteDialog({
             />
           </div>
           
+          {!validation.isValid && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>{validation.message}</AlertDescription>
+            </Alert>
+          )}
+          
           <div className="space-y-2">
             <Label>Route Summary</Label>
             <div className="bg-muted/20 rounded-lg p-3 space-y-2 text-sm">
@@ -158,7 +169,7 @@ export function SaveRouteDialog({
           </Button>
           <Button
             onClick={handleSave}
-            disabled={!routeName.trim() || isSaving}
+            disabled={!routeName.trim() || isSaving || !validation.isValid}
           >
             {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isSaving ? "Saving..." : "Save Route"}

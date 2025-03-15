@@ -126,21 +126,33 @@ export const validateRouteData = (
     };
   }
 
-  // Check if origin and destination have coordinates
-  const origin = stops.find(stop => stop.type === "origin");
-  const destination = stops.find(stop => stop.type === "destination");
+  // Check if at least one stop has address information
+  const hasValidStops = stops.some(stop => 
+    stop.address && (stop.latitude !== undefined && stop.longitude !== undefined)
+  );
 
-  if (!origin?.latitude || !origin?.longitude) {
+  if (!hasValidStops) {
     return { 
       isValid: false, 
-      message: "The starting point must have valid coordinates"
+      message: "At least one stop must have a valid address and coordinates"
     };
   }
 
-  if (!destination?.latitude || !destination?.longitude) {
+  // Check if origin has coordinates
+  const origin = stops.find(stop => stop.type === "origin");
+  if (origin && (!origin.latitude || !origin.longitude)) {
     return { 
       isValid: false, 
-      message: "The destination must have valid coordinates"
+      message: "The starting point must have valid coordinates. Please add a valid origin point on the map."
+    };
+  }
+
+  // Check if destination has coordinates
+  const destination = stops.find(stop => stop.type === "destination");
+  if (destination && (!destination.latitude || !destination.longitude)) {
+    return { 
+      isValid: false, 
+      message: "The destination must have valid coordinates. Please add a valid destination on the map."
     };
   }
 

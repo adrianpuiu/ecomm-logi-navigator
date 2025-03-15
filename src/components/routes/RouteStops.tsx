@@ -3,7 +3,8 @@ import { RouteStop } from "@/types/route";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MapPin, Plus, X } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { MapPin, Plus, X, AlertTriangle } from "lucide-react";
 
 interface RouteStopsProps {
   stops: RouteStop[];
@@ -30,16 +31,46 @@ export function RouteStops({
   timeWindowEnd,
   setTimeWindowEnd,
 }: RouteStopsProps) {
+  // Check for stops without coordinates
+  const hasOriginCoordinates = stops.some(
+    stop => stop.type === "origin" && stop.latitude && stop.longitude
+  );
+  
+  const hasDestinationCoordinates = stops.some(
+    stop => stop.type === "destination" && stop.latitude && stop.longitude
+  );
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Route Stops</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {!hasOriginCoordinates && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              The starting point must have valid coordinates. Click on the map to set the origin location.
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {!hasDestinationCoordinates && stops.length > 1 && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              The destination must have valid coordinates. Click on the map to set the destination location.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="space-y-4">
           {stops.map((stop, index) => (
             <div key={stop.id} className="flex items-center gap-2">
-              <div className="bg-muted w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 
+                ${stop.type === 'origin' ? 'bg-green-500 text-white' : 
+                  stop.type === 'destination' ? 'bg-red-500 text-white' : 
+                  'bg-blue-500 text-white'}`}>
                 {index + 1}
               </div>
               <div className="flex-grow">
@@ -49,10 +80,15 @@ export function RouteStops({
                                'Stop'} address`}
                   value={stop.address}
                   onChange={(e) => onUpdateStop(stop.id, { address: e.target.value })}
+                  className={!stop.latitude && !stop.longitude ? "border-red-300" : ""}
                 />
-                {stop.latitude && stop.longitude && (
+                {stop.latitude && stop.longitude ? (
                   <div className="text-xs text-muted-foreground mt-1">
                     Lat: {stop.latitude.toFixed(5)}, Lng: {stop.longitude.toFixed(5)}
+                  </div>
+                ) : (
+                  <div className="text-xs text-red-500 mt-1">
+                    No coordinates - click on the map to set location
                   </div>
                 )}
               </div>
