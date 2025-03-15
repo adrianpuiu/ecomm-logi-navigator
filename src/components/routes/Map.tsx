@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { MapPin, Route, Navigation, AlertTriangle, Layers } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -22,7 +21,6 @@ export function Map({ stops = [], onAddStop }: MapProps) {
   const [mapStyle, setMapStyle] = useState<string>("mapbox://styles/mapbox/streets-v12");
   const { toast } = useToast();
   
-  // Initialize the map
   useEffect(() => {
     if (!mapboxToken || showTokenInput || !mapContainerRef.current) return;
     
@@ -32,15 +30,12 @@ export function Map({ stops = [], onAddStop }: MapProps) {
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: mapStyle,
-        center: [-95.7129, 37.0902], // Center of US by default
+        center: [-95.7129, 37.0902],
         zoom: 3.5,
         attributionControl: true
       });
       
-      // Add navigation controls
       map.addControl(new mapboxgl.NavigationControl(), 'top-left');
-      
-      // Add geolocate control
       map.addControl(
         new mapboxgl.GeolocateControl({
           positionOptions: {
@@ -50,22 +45,17 @@ export function Map({ stops = [], onAddStop }: MapProps) {
         }),
         'top-left'
       );
-      
-      // Add scale control
       map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
       
       mapRef.current = map;
       
-      // Add markers for existing stops
       if (stops.length > 0) {
         addMarkersToMap(map, stops);
       }
       
-      // Handle click events to add stops
       map.on('click', (e) => {
         if (onAddStop) {
           const { lng, lat } = e.lngLat;
-          // Reverse geocode to get address
           reverseGeocode(lng, lat, mapboxToken).then((address) => {
             const newStop: RouteStop = {
               id: `stop-${Date.now()}`,
@@ -92,18 +82,14 @@ export function Map({ stops = [], onAddStop }: MapProps) {
     }
   }, [mapboxToken, showTokenInput, mapStyle, stops, onAddStop, toast]);
 
-  // Update markers when stops change
   useEffect(() => {
     if (!mapRef.current || !mapboxToken || showTokenInput) return;
     
-    // Remove existing markers
     const markers = document.querySelectorAll('.mapboxgl-marker');
     markers.forEach(marker => marker.remove());
     
-    // Add updated markers
     addMarkersToMap(mapRef.current, stops);
     
-    // If we have at least 2 stops, show the route
     if (stops.length >= 2) {
       const coordinates = stops
         .filter(stop => stop.longitude && stop.latitude)
@@ -119,7 +105,6 @@ export function Map({ stops = [], onAddStop }: MapProps) {
     stops.forEach((stop, index) => {
       if (!stop.latitude || !stop.longitude) return;
       
-      // Create custom marker element
       const el = document.createElement('div');
       el.className = 'custom-marker';
       el.style.width = '30px';
@@ -134,12 +119,10 @@ export function Map({ stops = [], onAddStop }: MapProps) {
       el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
       el.innerHTML = String(index + 1);
       
-      // Add popup
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
         `<strong>${getStopTypeLabel(stop.type)}</strong><br>${stop.address}`
       );
       
-      // Add marker to map
       new mapboxgl.Marker(el)
         .setLngLat([stop.longitude, stop.latitude])
         .setPopup(popup)
@@ -149,10 +132,10 @@ export function Map({ stops = [], onAddStop }: MapProps) {
 
   const getMarkerColor = (type: string): string => {
     switch (type) {
-      case "origin": return '#4CAF50'; // Green
-      case "destination": return '#F44336'; // Red
-      case "waypoint": return '#2196F3'; // Blue
-      default: return '#9C27B0'; // Purple
+      case "origin": return '#4CAF50';
+      case "destination": return '#F44336';
+      case "waypoint": return '#2196F3';
+      default: return '#9C27B0';
     }
   };
 
@@ -165,16 +148,26 @@ export function Map({ stops = [], onAddStop }: MapProps) {
     }
   };
 
-  const drawRoute = async (map: mapboxgl.Map, coordinates: [number, number][], token: string) => {
+  const drawRoute = async (map: mapboxgl.Map, coordinates: number[][], token: string) => {
     try {
-      // Remove existing route layers
       if (map.getLayer('route')) map.removeLayer('route');
       if (map.getSource('route')) map.removeSource('route');
       
-      // Format coordinates for the Directions API
-      const coordString = coordinates.map(coord => coord.join(',')).join(';');
+      const validCoordinates = coordinates.filter(
+        coord => Array.isArray(coord) && coord.length === 2
+      ) as [number, number][];
       
-      // Call Mapbox Directions API
+      if (validCoordinates.length < 2) {
+        toast({
+          title: "Invalid Route",
+          description: "Not enough valid coordinates to draw a route.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      const coordString = validCoordinates.map(coord => coord.join(',')).join(';');
+      
       const response = await fetch(
         `https://api.mapbox.com/directions/v5/mapbox/driving/${coordString}?geometries=geojson&access_token=${token}`
       );
@@ -194,7 +187,6 @@ export function Map({ stops = [], onAddStop }: MapProps) {
       
       const route = data.routes[0].geometry;
       
-      // Add the route to the map
       map.addSource('route', {
         type: 'geojson',
         data: {
@@ -219,10 +211,9 @@ export function Map({ stops = [], onAddStop }: MapProps) {
         }
       });
       
-      // Adjust map viewport to show the entire route
-      const bounds = coordinates.reduce((bounds, coord) => {
+      const bounds = validCoordinates.reduce((bounds, coord) => {
         return bounds.extend(coord as mapboxgl.LngLatLike);
-      }, new mapboxgl.LngLatBounds(coordinates[0] as mapboxgl.LngLatLike, coordinates[0] as mapboxgl.LngLatLike));
+      }, new mapboxgl.LngLatBounds(validCoordinates[0] as mapboxgl.LngLatLike, validCoordinates[0] as mapboxgl.LngLatLike));
       
       map.fitBounds(bounds, {
         padding: 50,
@@ -274,7 +265,6 @@ export function Map({ stops = [], onAddStop }: MapProps) {
     if (!mapRef.current) return;
     
     if (stops.length >= 2) {
-      // If we have stops, fit bounds to show all stops
       const coordinates = stops
         .filter(stop => stop.longitude && stop.latitude)
         .map(stop => [stop.longitude, stop.latitude] as [number, number]);
@@ -292,7 +282,6 @@ export function Map({ stops = [], onAddStop }: MapProps) {
       }
     }
     
-    // Default center if no stops
     mapRef.current.flyTo({
       center: [-95.7129, 37.0902],
       zoom: 3.5
