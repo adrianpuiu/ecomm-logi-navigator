@@ -22,6 +22,8 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
       return null;
     }
 
+    console.log("Saving route:", route);
+
     // First save the main route
     const { data: routeData, error: routeError } = await supabase
       .from('routes')
@@ -47,18 +49,22 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
       throw routeError;
     }
 
+    console.log("Route saved successfully:", routeData);
+
     // Then save the stops
     if (route.stops && route.stops.length > 0) {
       const stopsToInsert = route.stops.map((stop, index) => ({
         route_id: routeData.id,
         address: stop.address,
-        latitude: stop.latitude,
-        longitude: stop.longitude,
+        latitude: stop.latitude !== undefined ? stop.latitude : null,
+        longitude: stop.longitude !== undefined ? stop.longitude : null,
         type: stop.type,
         order_index: index,
         arrival_time: stop.arrivalTime?.toISOString(),
         departure_time: stop.departureTime?.toISOString(),
       }));
+
+      console.log("Saving route stops:", stopsToInsert);
 
       const { error: stopsError } = await supabase
         .from('route_stops')
@@ -68,6 +74,8 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
         console.error('Error saving route stops:', stopsError);
         throw stopsError;
       }
+
+      console.log("Route stops saved successfully");
     }
 
     // Format the data to match our Route type
@@ -156,7 +164,7 @@ export const validateRouteData = (
     };
   }
 
-  if (!name) {
+  if (!name || name.trim() === '') {
     return { 
       isValid: false, 
       message: "Please provide a name for the route"

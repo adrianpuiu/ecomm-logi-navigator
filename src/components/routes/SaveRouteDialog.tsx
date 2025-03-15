@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
 import { RouteStop, RouteConstraint, OptimizationPriority, Driver, Vehicle } from "@/types/route";
-import { saveRoute, validateRouteData } from "@/utils/routeUtils";
+import { saveRoute, validateRouteData, calculateRouteCost } from "@/utils/routeUtils";
 import { Loader2, AlertTriangle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SaveRouteDialogProps {
   open: boolean;
@@ -39,6 +40,14 @@ export function SaveRouteDialog({
   // Check if the route data is valid
   const validation = validateRouteData(routeData.stops, routeName);
   
+  // Calculate estimated cost based on route data
+  const estimatedCost = calculateRouteCost(
+    routeData.distance, 
+    routeData.duration, 
+    routeData.vehicle?.type || undefined, 
+    routeData.constraints.avoidTolls
+  );
+  
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -56,11 +65,21 @@ export function SaveRouteDialog({
         };
       }
       
+      // Ensure all stops have valid coordinates before saving
+      const validatedStops = routeData.stops.map(stop => {
+        // If coordinates are undefined, convert to null for database storage
+        return {
+          ...stop,
+          latitude: stop.latitude || null,
+          longitude: stop.longitude || null
+        };
+      });
+      
       const savedRoute = await saveRoute({
         name: routeName,
         date: routeData.deliveryDate ? new Date(routeData.deliveryDate) : new Date(),
         timeWindow,
-        stops: routeData.stops,
+        stops: validatedStops,
         driver: routeData.driver,
         vehicle: routeData.vehicle,
         optimizationPriority: routeData.optimizationPriority,
@@ -68,6 +87,7 @@ export function SaveRouteDialog({
         status: "planned",
         distance: routeData.distance,
         duration: routeData.duration,
+        estimatedCost: estimatedCost,
       });
       
       if (savedRoute) {
@@ -133,6 +153,11 @@ export function SaveRouteDialog({
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Stops:</span>
                 <span>{routeData.stops.length}</span>
+              </div>
+              
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Estimated Cost:</span>
+                <span>${estimatedCost.toFixed(2)}</span>
               </div>
               
               {routeData.deliveryDate && (
