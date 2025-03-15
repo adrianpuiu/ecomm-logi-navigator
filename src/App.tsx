@@ -13,6 +13,8 @@ import Carriers from "./pages/Carriers";
 import CarrierDetail from "./pages/CarrierDetail";
 import AddCarrier from "./pages/AddCarrier";
 import RoutePlanning from "./pages/Routes";
+import ReturnsManagement from "./pages/ReturnsManagement";
+import ReturnDetail from "./pages/ReturnDetail";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +33,8 @@ const App = () => (
           <Route path="/carrier/:id" element={<CarrierDetail />} />
           <Route path="/carriers/new" element={<AddCarrier />} />
           <Route path="/routes" element={<RoutePlanning />} />
+          <Route path="/returns" element={<ReturnsManagement />} />
+          <Route path="/returns/:id" element={<ReturnDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
