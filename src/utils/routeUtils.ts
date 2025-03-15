@@ -11,6 +11,17 @@ import { Json } from "@/integrations/supabase/types";
  */
 export const saveRoute = async (route: Partial<Route>): Promise<Route | null> => {
   try {
+    // Validate the route data before saving
+    const validation = validateRouteData(route.stops || [], route.name);
+    if (!validation.isValid) {
+      toast({
+        title: "Validation Error",
+        description: validation.message,
+        variant: "destructive"
+      });
+      return null;
+    }
+
     // First save the main route
     const { data: routeData, error: routeError } = await supabase
       .from('routes')
@@ -141,4 +152,55 @@ export const validateRouteData = (
   }
 
   return { isValid: true };
+};
+
+/**
+ * Calculates the estimated cost of a route
+ * @param distance Distance in meters
+ * @param duration Duration in seconds
+ * @param vehicleType Type of vehicle (affects fuel consumption)
+ * @param avoidTolls Whether tolls are avoided
+ * @returns Estimated cost in dollars
+ */
+export const calculateRouteCost = (
+  distance: number,
+  duration: number,
+  vehicleType?: string,
+  avoidTolls?: boolean
+): number => {
+  // Base rates
+  const baseRatePerKm = 1.5;         // $ per km
+  const driverRatePerHour = 30;      // $ per hour
+  const estimatedTollCost = avoidTolls ? 0 : distance / 50000; // Rough estimate
+  
+  // Vehicle-specific fuel consumption adjustments
+  let fuelEfficiencyFactor = 1.0;
+  if (vehicleType) {
+    switch (vehicleType.toLowerCase()) {
+      case 'van':
+        fuelEfficiencyFactor = 0.9;
+        break;
+      case 'refrigerated':
+        fuelEfficiencyFactor = 1.3; // Higher fuel consumption for refrigeration
+        break;
+      case 'flatbed':
+        fuelEfficiencyFactor = 1.2;
+        break;
+      case 'tanker':
+        fuelEfficiencyFactor = 1.4;
+        break;
+      default:
+        fuelEfficiencyFactor = 1.0;
+    }
+  }
+  
+  // Calculate component costs
+  const distanceCost = (distance / 1000) * baseRatePerKm * fuelEfficiencyFactor;
+  const timeCost = (duration / 3600) * driverRatePerHour;
+  
+  // Total estimated cost
+  const totalCost = distanceCost + timeCost + estimatedTollCost;
+  
+  // Round to 2 decimal places
+  return Math.round(totalCost * 100) / 100;
 };
