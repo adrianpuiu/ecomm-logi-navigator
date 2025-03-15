@@ -31,6 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [session, setSession] = useState<Session | null>({
     access_token: "mock-token",
     refresh_token: "mock-refresh-token",
+    token_type: "bearer", // Added the required token_type property
     expires_at: 9999999999,
     expires_in: 9999999999,
     user: mockUser,
