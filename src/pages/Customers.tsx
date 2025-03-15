@@ -26,45 +26,47 @@ export default function Customers() {
         <title>Customers | Logistics TMS</title>
       </Helmet>
       
-      <div className="flex flex-col gap-6 p-4 md:p-6 ml-[240px]">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-          <p className="text-muted-foreground">
-            Manage your customers and view their order history
-          </p>
-        </div>
+      <div className="flex flex-col min-h-screen bg-background ml-[240px] w-[calc(100%-240px)]">
+        <div className="p-4 md:p-6">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
+            <p className="text-muted-foreground">
+              Manage your customers and view their order history
+            </p>
+          </div>
 
-        <Card>
-          <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-            <div>
-              <CardTitle>Customer Management</CardTitle>
-              <CardDescription>
-                A list of all your customers
-              </CardDescription>
-            </div>
-            <Button onClick={() => navigate("/customers/new")}>
-              Add Customer
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
-              <div className="relative w-full md:w-96">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search customers..."
-                  className="pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+          <Card className="mt-6">
+            <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
+              <div>
+                <CardTitle>Customer Management</CardTitle>
+                <CardDescription>
+                  A list of all your customers
+                </CardDescription>
+              </div>
+              <Button onClick={() => navigate("/customers/new")}>
+                Add Customer
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+                <div className="relative w-full md:w-96">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search customers..."
+                    className="pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <CustomerSegmentFilter 
+                  selectedSegment={selectedSegment} 
+                  onSegmentChange={setSelectedSegment} 
                 />
               </div>
-              <CustomerSegmentFilter 
-                selectedSegment={selectedSegment} 
-                onSegmentChange={setSelectedSegment} 
-              />
-            </div>
-            <CustomerTable searchTerm={searchTerm} selectedSegment={selectedSegment} />
-          </CardContent>
-        </Card>
+              <CustomerTable searchTerm={searchTerm} selectedSegment={selectedSegment} />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </>
   );

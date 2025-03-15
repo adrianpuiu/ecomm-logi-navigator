@@ -64,45 +64,48 @@ export default function CustomerDetail() {
         <title>{`${customer.firstName} ${customer.lastName} | Customer Details`}</title>
       </Helmet>
       
-      <div className="flex flex-col gap-6 p-4 md:p-6">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {customer.firstName} {customer.lastName}
-          </h1>
-          <p className="text-muted-foreground">
-            Customer ID: {customer.id}
-          </p>
-        </div>
+      {/* Updated container to ensure it doesn't get behind the sidebar */}
+      <div className="flex flex-col min-h-screen bg-background ml-[240px] w-[calc(100%-240px)]">
+        <div className="p-4 md:p-6">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-3xl font-bold tracking-tight">
+              {customer.firstName} {customer.lastName}
+            </h1>
+            <p className="text-muted-foreground">
+              Customer ID: {customer.id}
+            </p>
+          </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="returns">Returns</TabsTrigger>
-            <TabsTrigger value="communication">Communication</TabsTrigger>
-            <TabsTrigger value="notes">Notes</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="details" className="mt-6">
-            <CustomerDetails customer={customer} />
-          </TabsContent>
-          
-          <TabsContent value="orders" className="mt-6">
-            <CustomerOrderHistory customerId={customer.id} />
-          </TabsContent>
-          
-          <TabsContent value="returns" className="mt-6">
-            <CustomerReturnHistory customerId={customer.id} />
-          </TabsContent>
-          
-          <TabsContent value="communication" className="mt-6">
-            <CustomerCommunicationLog customerId={customer.id} />
-          </TabsContent>
-          
-          <TabsContent value="notes" className="mt-6">
-            <CustomerNotes customerId={customer.id} />
-          </TabsContent>
-        </Tabs>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-6">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="orders">Orders</TabsTrigger>
+              <TabsTrigger value="returns">Returns</TabsTrigger>
+              <TabsTrigger value="communication">Communication</TabsTrigger>
+              <TabsTrigger value="notes">Notes</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="details" className="mt-6">
+              <CustomerDetails customer={customer} />
+            </TabsContent>
+            
+            <TabsContent value="orders" className="mt-6">
+              <CustomerOrderHistory customerId={customer.id} />
+            </TabsContent>
+            
+            <TabsContent value="returns" className="mt-6">
+              <CustomerReturnHistory customerId={customer.id} />
+            </TabsContent>
+            
+            <TabsContent value="communication" className="mt-6">
+              <CustomerCommunicationLog customerId={customer.id} />
+            </TabsContent>
+            
+            <TabsContent value="notes" className="mt-6">
+              <CustomerNotes customerId={customer.id} />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </>
   );
