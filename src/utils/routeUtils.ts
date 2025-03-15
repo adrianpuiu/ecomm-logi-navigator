@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Route, RouteStop } from "@/types/route";
+import { Route, RouteStop, RouteStatus } from "@/types/route";
 import { toast } from "@/components/ui/use-toast";
 
 /**
@@ -30,7 +30,10 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
       .select()
       .single();
 
-    if (routeError) throw routeError;
+    if (routeError) {
+      console.error('Error saving route:', routeError);
+      throw routeError;
+    }
 
     // Then save the stops
     if (route.stops && route.stops.length > 0) {
@@ -49,10 +52,35 @@ export const saveRoute = async (route: Partial<Route>): Promise<Route | null> =>
         .from('route_stops')
         .insert(stopsToInsert);
 
-      if (stopsError) throw stopsError;
+      if (stopsError) {
+        console.error('Error saving route stops:', stopsError);
+        throw stopsError;
+      }
     }
 
-    return routeData as unknown as Route;
+    // Format the data to match our Route type
+    const savedRoute: Route = {
+      id: routeData.id,
+      name: routeData.name,
+      date: new Date(routeData.date),
+      timeWindow: routeData.time_window_start && routeData.time_window_end ? {
+        start: new Date(routeData.time_window_start),
+        end: new Date(routeData.time_window_end)
+      } : undefined,
+      stops: route.stops || [],
+      driver: route.driver,
+      vehicle: route.vehicle,
+      optimizationPriority: routeData.optimization_priority,
+      constraints: routeData.constraints,
+      status: routeData.status as RouteStatus,
+      distance: routeData.distance,
+      duration: routeData.duration,
+      estimatedCost: routeData.estimated_cost,
+      createdAt: new Date(routeData.created_at),
+      updatedAt: new Date(routeData.updated_at)
+    };
+
+    return savedRoute;
   } catch (error) {
     console.error('Error saving route:', error);
     return null;

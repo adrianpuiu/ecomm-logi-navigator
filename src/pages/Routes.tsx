@@ -162,7 +162,7 @@ export default function Routes() {
     }
     
     // Construct the route object
-    const route = {
+    const route: Partial<Route> = {
       name: routeName,
       date: deliveryDate ? new Date(deliveryDate) : new Date(),
       timeWindow,
@@ -171,12 +171,10 @@ export default function Routes() {
       vehicle: selectedVehicle,
       optimizationPriority,
       constraints: routeConstraints,
-      status: "planned",
+      status: "planned" as RouteStatus,
       distance: routeDistance,
       duration: routeDuration,
       estimatedCost: calculateEstimatedCost(routeDistance, routeDuration),
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
     
     const savedRoute = await saveRoute(route);

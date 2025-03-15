@@ -1,4 +1,5 @@
 
+
 export type OptimizationPriority = "fastest" | "shortest" | "cost";
 
 export type RouteConstraint = {
@@ -61,7 +62,7 @@ export type Route = {
   id: string;
   name: string;
   date: Date;
-  timeWindow: {
+  timeWindow?: {
     start: Date;
     end: Date;
   };
@@ -74,6 +75,7 @@ export type Route = {
   distance: number;
   duration: number;
   estimatedCost: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
+
