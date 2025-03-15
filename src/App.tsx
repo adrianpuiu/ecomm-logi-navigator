@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { Sidebar, SidebarProvider } from "@/components/layout/Sidebar";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 
@@ -30,6 +30,14 @@ import UserProfile from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
 
+// Helper component to wrap routes with SidebarProvider
+const WithSidebar = ({ children }: { children: React.ReactNode }) => (
+  <SidebarProvider>
+    <Sidebar />
+    {children}
+  </SidebarProvider>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -46,19 +54,13 @@ const App = () => (
               {/* Protected routes with sidebar */}
               <Route
                 path="/"
-                element={
-                  <>
-                    <Sidebar />
-                    <Index />
-                  </>
-                }
+                element={<WithSidebar><Index /></WithSidebar>}
               />
               <Route
                 path="/shipments"
                 element={
                   <RoleGuard allowedRoles={["administrator", "dispatcher", "planner", "transportation_manager", "customer_service"]}>
-                    <Sidebar />
-                    <Shipments />
+                    <WithSidebar><Shipments /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -66,8 +68,7 @@ const App = () => (
                 path="/shipments/create"
                 element={
                   <RoleGuard allowedRoles={["administrator", "dispatcher", "planner", "transportation_manager"]}>
-                    <Sidebar />
-                    <CreateShipment />
+                    <WithSidebar><CreateShipment /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -75,8 +76,7 @@ const App = () => (
                 path="/shipment/:id"
                 element={
                   <RoleGuard allowedRoles={["administrator", "dispatcher", "planner", "transportation_manager", "customer_service", "shipper", "carrier"]}>
-                    <Sidebar />
-                    <Shipment />
+                    <WithSidebar><Shipment /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -84,8 +84,7 @@ const App = () => (
                 path="/carriers"
                 element={
                   <RoleGuard allowedRoles={["administrator", "freight_manager", "transportation_manager"]}>
-                    <Sidebar />
-                    <Carriers />
+                    <WithSidebar><Carriers /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -93,8 +92,7 @@ const App = () => (
                 path="/carrier/:id"
                 element={
                   <RoleGuard allowedRoles={["administrator", "freight_manager", "transportation_manager"]}>
-                    <Sidebar />
-                    <CarrierDetail />
+                    <WithSidebar><CarrierDetail /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -102,8 +100,7 @@ const App = () => (
                 path="/carriers/new"
                 element={
                   <RoleGuard allowedRoles={["administrator", "freight_manager"]}>
-                    <Sidebar />
-                    <AddCarrier />
+                    <WithSidebar><AddCarrier /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -111,8 +108,7 @@ const App = () => (
                 path="/routes"
                 element={
                   <RoleGuard allowedRoles={["administrator", "dispatcher", "planner", "transportation_manager"]}>
-                    <Sidebar />
-                    <RoutePlanning />
+                    <WithSidebar><RoutePlanning /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -120,8 +116,7 @@ const App = () => (
                 path="/returns"
                 element={
                   <RoleGuard allowedRoles={["administrator", "dispatcher", "customer_service", "transportation_manager"]}>
-                    <Sidebar />
-                    <ReturnsManagement />
+                    <WithSidebar><ReturnsManagement /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -129,8 +124,7 @@ const App = () => (
                 path="/returns/:id"
                 element={
                   <RoleGuard allowedRoles={["administrator", "dispatcher", "customer_service", "transportation_manager"]}>
-                    <Sidebar />
-                    <ReturnDetail />
+                    <WithSidebar><ReturnDetail /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -138,8 +132,7 @@ const App = () => (
                 path="/customers"
                 element={
                   <RoleGuard allowedRoles={["administrator", "customer_service", "transportation_manager"]}>
-                    <Sidebar />
-                    <Customers />
+                    <WithSidebar><Customers /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -147,8 +140,7 @@ const App = () => (
                 path="/customers/:id"
                 element={
                   <RoleGuard allowedRoles={["administrator", "customer_service", "transportation_manager"]}>
-                    <Sidebar />
-                    <CustomerDetail />
+                    <WithSidebar><CustomerDetail /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -156,8 +148,7 @@ const App = () => (
                 path="/customers/new"
                 element={
                   <RoleGuard allowedRoles={["administrator", "customer_service", "transportation_manager"]}>
-                    <Sidebar />
-                    <AddCustomer />
+                    <WithSidebar><AddCustomer /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -165,8 +156,7 @@ const App = () => (
                 path="/analytics"
                 element={
                   <RoleGuard allowedRoles={["administrator", "transportation_manager", "finance"]}>
-                    <Sidebar />
-                    <Analytics />
+                    <WithSidebar><Analytics /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -174,8 +164,7 @@ const App = () => (
                 path="/same-day-delivery"
                 element={
                   <RoleGuard allowedRoles={["administrator", "dispatcher", "planner", "transportation_manager"]}>
-                    <Sidebar />
-                    <SameDayDelivery />
+                    <WithSidebar><SameDayDelivery /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -183,8 +172,7 @@ const App = () => (
                 path="/profile"
                 element={
                   <RoleGuard allowedRoles={["administrator", "dispatcher", "planner", "freight_manager", "master_data_specialist", "finance", "customer_service", "shipper", "carrier", "transportation_manager"]}>
-                    <Sidebar />
-                    <UserProfile />
+                    <WithSidebar><UserProfile /></WithSidebar>
                   </RoleGuard>
                 }
               />
@@ -192,10 +180,7 @@ const App = () => (
               <Route
                 path="*"
                 element={
-                  <>
-                    <Sidebar />
-                    <NotFound />
-                  </>
+                  <WithSidebar><NotFound /></WithSidebar>
                 }
               />
             </Routes>
