@@ -65,12 +65,15 @@ export function ShipmentVolumeByRegionChart({ dateRange }: ShipmentVolumeByRegio
             <Legend />
             <Bar dataKey="domestic" name="Domestic" stackId="a" fill="var(--color-domestic)" radius={[4, 4, 0, 0]} />
             <Bar dataKey="international" name="International" stackId="a" fill="var(--color-international)" radius={[4, 4, 0, 0]} />
+            {/* Fixed: Removed dataKey and using y instead for the ReferenceLine */}
             <ReferenceLine 
-              dataKey="target" 
+              yAxisId={0}
+              y={data[0].target} 
               stroke="var(--color-target)" 
               strokeWidth={2} 
               strokeDasharray="5 5" 
               ifOverflow="extendDomain"
+              label="Target"
             />
           </BarChart>
         </ResponsiveContainer>
