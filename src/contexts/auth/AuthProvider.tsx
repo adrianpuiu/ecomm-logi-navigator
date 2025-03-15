@@ -18,118 +18,63 @@ export const AuthContext = createContext<AuthContextProps | undefined>(undefined
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   children 
 }) => {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [userRoles, setUserRoles] = useState<TmsRole[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Create a mock user and session when auth is disabled
+  const mockUser: User = {
+    id: "mock-user-id",
+    email: "admin@example.com",
+    created_at: new Date().toISOString(),
+    app_metadata: {},
+    user_metadata: {},
+    aud: "authenticated",
+  };
+  
+  const [session, setSession] = useState<Session | null>({
+    access_token: "mock-token",
+    refresh_token: "mock-refresh-token",
+    expires_at: 9999999999,
+    expires_in: 9999999999,
+    user: mockUser,
+  });
+  
+  const [user, setUser] = useState<User | null>(mockUser);
+  const [userRoles, setUserRoles] = useState<TmsRole[]>(["administrator"]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
-  useEffect(() => {
-    // Initial session check
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsAuthenticated(!!session?.user);
-      
-      if (session?.user) {
-        fetchUserRolesAndUpdate(session.user.id);
-      } else {
-        setIsLoading(false);
-      }
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setIsAuthenticated(!!session?.user);
-        
-        if (session?.user) {
-          await fetchUserRolesAndUpdate(session.user.id);
-        } else {
-          setUserRoles([]);
-          setIsLoading(false);
-        }
-      }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
+  // Skip actual auth calls since we're mocking everything
   const fetchUserRolesAndUpdate = async (userId: string) => {
-    try {
-      setIsLoading(true);
-      
-      // Fetch roles with email check for special admin
-      const roles = await fetchUserRoles(userId, user?.email);
-      setUserRoles(roles);
-      
-      // If no roles are found, assign a default one
-      if (roles.length === 0) {
-        await assignDefaultRole(userId);
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    // No-op when auth is disabled
+    return;
   };
 
   const assignDefaultRole = async (userId: string) => {
-    try {
-      setIsLoading(true);
-      await assignRole(userId);
-      // Refresh user roles after assigning
-      const roles = await fetchUserRoles(userId, user?.email);
-      setUserRoles(roles);
-    } finally {
-      setIsLoading(false);
-    }
+    // No-op when auth is disabled
+    return;
   };
 
   const signIn = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      await authSignIn(email, password);
-    } finally {
-      setIsLoading(false);
-    }
+    // No-op when auth is disabled
+    console.log("Auth disabled: Sign in skipped");
   };
 
   const signUp = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const { userId } = await authSignUp(email, password);
-      
-      // Assign a default role to the new user if we have a user ID
-      if (userId) {
-        try {
-          await assignDefaultRole(userId);
-        } catch (roleError) {
-          console.error('Error assigning default role during signup:', roleError);
-        }
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    // No-op when auth is disabled
+    console.log("Auth disabled: Sign up skipped");
   };
 
   const signOut = async () => {
-    setIsLoading(true);
-    try {
-      await authSignOut();
-    } finally {
-      setIsLoading(false);
-    }
+    // No-op when auth is disabled
+    console.log("Auth disabled: Sign out skipped");
   };
 
   const hasRole = (role: TmsRole): boolean => {
-    return checkRole(userRoles, role);
+    // Always return true for any role when auth is disabled
+    return true;
   };
 
   const hasAnyRole = (roles: TmsRole[]): boolean => {
-    return checkAnyRole(userRoles, roles);
+    // Always return true for any roles when auth is disabled
+    return true;
   };
 
   return (
