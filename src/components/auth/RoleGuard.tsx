@@ -3,6 +3,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth, TmsRole } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
+import { SidebarProvider, Sidebar } from "@/components/layout/Sidebar";
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -15,7 +16,7 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
   allowedRoles,
   fallbackPath = "/auth/login",
 }) => {
-  const { user, userRoles, isLoading, hasAnyRole } = useAuth();
+  const { user, userRoles, isLoading, hasAnyRole, isAuthenticated } = useAuth();
 
   if (isLoading) {
     return (
@@ -25,13 +26,17 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
     );
   }
 
-  if (!user) {
+  // If not authenticated, redirect to login
+  if (!isAuthenticated) {
     return <Navigate to={fallbackPath} replace />;
   }
 
+  // If authenticated but doesn't have the required role, show unauthorized page
+  // but still maintain the sidebar and layout
   if (!hasAnyRole(allowedRoles)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
+  // User is authenticated and has the required role
   return <>{children}</>;
 };

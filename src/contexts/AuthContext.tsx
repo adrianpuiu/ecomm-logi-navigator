@@ -35,6 +35,7 @@ interface AuthContextProps {
   signOut: () => Promise<void>;
   hasRole: (role: TmsRole) => boolean;
   hasAnyRole: (roles: TmsRole[]) => boolean;
+  isAuthenticated: boolean; // Added to explicitly check authentication status
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -46,12 +47,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [userRoles, setUserRoles] = useState<TmsRole[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setIsAuthenticated(!!session?.user);
+      
       if (session?.user) {
         fetchUserRoles(session.user.id);
       } else {
@@ -64,6 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        setIsAuthenticated(!!session?.user);
         
         if (session?.user) {
           await fetchUserRoles(session.user.id);
@@ -201,6 +206,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         signOut,
         hasRole,
         hasAnyRole,
+        isAuthenticated,
       }}
     >
       {children}

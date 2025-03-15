@@ -9,7 +9,7 @@ import { UserMenu } from "@/components/auth/UserMenu";
 
 // This hook will handle redirects for unauthenticated users
 export function useAuthRedirect() {
-  const { user, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [hasChecked, setHasChecked] = useState(false);
@@ -23,13 +23,13 @@ export function useAuthRedirect() {
     if (authExemptPaths.includes(location.pathname)) return;
 
     // Check if user is authenticated
-    if (!user && !isLoading && !hasChecked) {
+    if (!isAuthenticated && !isLoading && !hasChecked) {
       navigate("/auth/login");
       setHasChecked(true);
     }
-  }, [user, isLoading, navigate, location.pathname, hasChecked]);
+  }, [isAuthenticated, isLoading, navigate, location.pathname, hasChecked]);
 
-  return { isAuthenticated: !!user };
+  return { isAuthenticated };
 }
 
 // Re-export all the named exports from the sidebar component
@@ -54,6 +54,7 @@ export {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarMenuSub,
   SidebarProvider,
   SidebarRail,
   SidebarSeparator,
