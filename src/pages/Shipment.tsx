@@ -27,7 +27,7 @@ export default function Shipment() {
   return (
     <>
       <Helmet>
-        <title>{`Shipment ${shipment.tracking_number} | Logistics TMS`}</title>
+        <title>{`Shipment ${shipment.carrier.trackingNumber} | Logistics TMS`}</title>
       </Helmet>
 
       <div className="ml-[240px] flex flex-col min-h-screen bg-background p-6">
