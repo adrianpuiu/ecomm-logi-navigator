@@ -9,12 +9,11 @@ import { KpiCardsRow } from '@/components/analytics/KpiCardsRow';
 import { Button } from '@/components/ui/button';
 import { Calendar, FileText, LayoutDashboard, Settings } from 'lucide-react';
 import { DateRangePicker } from '@/components/analytics/DateRangePicker';
+import { DateRange } from 'react-day-picker';
 
 export default function Analytics() {
-  const [dateRange, setDateRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
+  // Update the state type to match DateRange from react-day-picker
+  const [dateRange, setDateRange] = useState<DateRange>({
     from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
     to: new Date(),
   });
@@ -79,3 +78,4 @@ export default function Analytics() {
     </>
   );
 }
+
