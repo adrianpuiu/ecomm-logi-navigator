@@ -100,7 +100,7 @@ const MOCK_PENDING_DELIVERIES = [
     address: "Vinohradská 112, Prague 3, 13000",
     requestedWindow: "4:00 PM - 7:00 PM",
     status: "ready_for_dispatch" as PendingDeliveryStatus,
-    priority: "normal"
+    priority: "normal" as "normal" | "high"
   },
   {
     id: "DEL-5429",
@@ -110,7 +110,7 @@ const MOCK_PENDING_DELIVERIES = [
     address: "Anglická 28, Prague 2, 12000",
     requestedWindow: "3:00 PM - 6:00 PM",
     status: "ready_for_dispatch" as PendingDeliveryStatus,
-    priority: "high"
+    priority: "high" as "normal" | "high"
   },
   {
     id: "DEL-5430",
@@ -120,7 +120,7 @@ const MOCK_PENDING_DELIVERIES = [
     address: "Korunní 65, Prague 3, 13000",
     requestedWindow: "5:00 PM - 8:00 PM",
     status: "ready_for_dispatch" as PendingDeliveryStatus,
-    priority: "normal"
+    priority: "normal" as "normal" | "high"
   }
 ];
 
@@ -234,7 +234,7 @@ export function DispatchCenter() {
     // Simulate optimization process
     setTimeout(() => {
       // Automatically assign deliveries based on "optimal" assignment
-      const updatedDeliveries = pendingDeliveries.map((delivery, index) => {
+      const updatedDeliveries: PendingDelivery[] = pendingDeliveries.map((delivery, index) => {
         // Simple round-robin assignment for demo purposes
         const driverIndex = index % drivers.length;
         return { 
