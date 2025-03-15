@@ -32,6 +32,31 @@ export function useAuthRedirect() {
   return { isAuthenticated: !!user };
 }
 
-// Export the original Sidebar but without importing it
-// This resolves the circular reference
-export { default as Sidebar } from "@/components/ui/sidebar";
+// Re-export all the named exports from the sidebar component
+// This resolves the circular reference by using named exports instead of default export
+export {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupAction,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInput,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuAction,
+  SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSkeleton,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarSeparator,
+  SidebarTrigger,
+  useSidebar
+} from "@/components/ui/sidebar";
