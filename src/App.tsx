@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -54,12 +53,16 @@ const App = () => (
               {/* Protected routes with sidebar */}
               <Route
                 path="/"
-                element={<WithSidebar><Index /></WithSidebar>}
+                element={
+                  <RoleGuard allowedRoles={["administrator", "dispatcher", "planner", "transportation_manager", "customer_service", "shipper", "carrier"]}>
+                    <WithSidebar><Index /></WithSidebar>
+                  </RoleGuard>
+                }
               />
               <Route
                 path="/shipments"
                 element={
-                  <RoleGuard allowedRoles={["administrator", "dispatcher", "planner", "transportation_manager", "customer_service"]}>
+                  <RoleGuard allowedRoles={["administrator", "dispatcher", "planner", "transportation_manager"]}>
                     <WithSidebar><Shipments /></WithSidebar>
                   </RoleGuard>
                 }
