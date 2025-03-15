@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Route, RouteStop, RouteStatus, RouteConstraint, OptimizationPriority } from "@/types/route";
+import { Route, RouteStop, RouteStatus, RouteConstraint, OptimizationPriority, Driver, Vehicle } from "@/types/route";
 import { toast } from "@/components/ui/use-toast";
 import { Json } from "@/integrations/supabase/types";
 
@@ -223,4 +223,151 @@ export const calculateRouteCost = (
   
   // Round to 2 decimal places
   return Math.round(totalCost * 100) / 100;
+};
+
+/**
+ * Fetches routes from the database with optional filtering
+ * @param filter Optional filter object for querying routes
+ * @returns Promise with an array of routes
+ */
+export const fetchRoutes = async (filter?: {
+  driverName?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+  status?: RouteStatus;
+}): Promise<Route[]> => {
+  try {
+    let query = supabase.from('routes').select(`
+      *,
+      route_stops (*),
+      drivers:driver_id (*),
+      vehicles:vehicle_id (*)
+    `);
+    
+    // Apply filters if provided
+    if (filter) {
+      if (filter.driverName) {
+        // This assumes there's a column called 'name' in the drivers table
+        query = query.filter('drivers.name', 'ilike', `%${filter.driverName}%`);
+      }
+      
+      if (filter.dateFrom) {
+        query = query.gte('date', filter.dateFrom.toISOString());
+      }
+      
+      if (filter.dateTo) {
+        query = query.lte('date', filter.dateTo.toISOString());
+      }
+      
+      if (filter.status) {
+        query = query.eq('status', filter.status);
+      }
+    }
+    
+    const { data, error } = await query;
+    
+    if (error) throw error;
+    
+    // Transform the data to match our Route type
+    const routes = data.map(item => {
+      return {
+        id: item.id,
+        name: item.name,
+        date: new Date(item.date),
+        timeWindow: item.time_window_start && item.time_window_end ? {
+          start: new Date(item.time_window_start),
+          end: new Date(item.time_window_end)
+        } : undefined,
+        // Transform stops from the joined table
+        stops: (item.route_stops || []).map((stop: any) => ({
+          id: stop.id,
+          address: stop.address,
+          latitude: stop.latitude,
+          longitude: stop.longitude,
+          type: stop.type,
+          arrivalTime: stop.arrival_time ? new Date(stop.arrival_time) : undefined,
+          departureTime: stop.departure_time ? new Date(stop.departure_time) : undefined,
+        })),
+        driver: item.drivers,
+        vehicle: item.vehicles,
+        optimizationPriority: item.optimization_priority as OptimizationPriority,
+        constraints: item.constraints as RouteConstraint,
+        status: item.status as RouteStatus,
+        distance: item.distance,
+        duration: item.duration,
+        estimatedCost: item.estimated_cost,
+        createdAt: new Date(item.created_at),
+        updatedAt: new Date(item.updated_at)
+      } as Route;
+    });
+    
+    return routes;
+  } catch (error) {
+    console.error('Error fetching routes:', error);
+    toast({
+      title: "Error fetching routes",
+      description: "There was a problem fetching the routes. Please try again.",
+      variant: "destructive"
+    });
+    return [];
+  }
+};
+
+/**
+ * Fetches available drivers for route assignment
+ * @returns Promise with an array of drivers
+ */
+export const fetchDrivers = async (): Promise<Driver[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('drivers')
+      .select('*');
+      
+    if (error) throw error;
+    
+    return data.map((driver: any) => ({
+      id: driver.id,
+      name: driver.name,
+      email: driver.email,
+      phone: driver.phone,
+      licenseNumber: driver.license_number,
+      licenseExpiry: driver.license_expiry ? new Date(driver.license_expiry) : undefined,
+      certifications: driver.certifications || [],
+      status: driver.status,
+    }));
+  } catch (error) {
+    console.error('Error fetching drivers:', error);
+    return [];
+  }
+};
+
+/**
+ * Fetches available vehicles for route assignment
+ * @returns Promise with an array of vehicles
+ */
+export const fetchVehicles = async (): Promise<Vehicle[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('vehicles')
+      .select('*');
+      
+    if (error) throw error;
+    
+    return data.map((vehicle: any) => ({
+      id: vehicle.id,
+      name: vehicle.name,
+      type: vehicle.type,
+      licensePlate: vehicle.license_plate,
+      capacity: {
+        weight: vehicle.capacity_weight,
+        volume: vehicle.capacity_volume,
+        pallets: vehicle.capacity_pallets,
+      },
+      features: vehicle.features || [],
+      status: vehicle.status,
+    }));
+  } catch (error) {
+    console.error('Error fetching vehicles:', error);
+    return [];
+  }
 };
