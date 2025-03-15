@@ -113,7 +113,7 @@ export function RouteDriverVehicle({
           <Label htmlFor="driver-select">Driver</Label>
           
           {!canAssignDrivers ? (
-            <Alert variant="warning">
+            <Alert variant="destructive">
               <ShieldAlert className="h-4 w-4" />
               <AlertTitle>Permission Required</AlertTitle>
               <AlertDescription>
@@ -154,7 +154,7 @@ export function RouteDriverVehicle({
           <Label htmlFor="vehicle-select">Vehicle</Label>
           
           {!canAssignVehicles ? (
-            <Alert variant="warning">
+            <Alert variant="destructive">
               <ShieldAlert className="h-4 w-4" />
               <AlertTitle>Permission Required</AlertTitle>
               <AlertDescription>
