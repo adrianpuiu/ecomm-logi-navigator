@@ -12,7 +12,7 @@ import CreateShipment from "./pages/CreateShipment";
 import Carriers from "./pages/Carriers";
 import CarrierDetail from "./pages/CarrierDetail";
 import AddCarrier from "./pages/AddCarrier";
-import Routes from "./pages/Routes";
+import RoutePlanning from "./pages/Routes";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +30,7 @@ const App = () => (
           <Route path="/carriers" element={<Carriers />} />
           <Route path="/carrier/:id" element={<CarrierDetail />} />
           <Route path="/carriers/new" element={<AddCarrier />} />
-          <Route path="/routes" element={<Routes />} />
+          <Route path="/routes" element={<RoutePlanning />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
