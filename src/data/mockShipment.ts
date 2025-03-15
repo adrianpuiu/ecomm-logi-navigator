@@ -96,37 +96,37 @@ export const mockShipment: ShipmentType = {
       timestamp: "2023-10-05T14:30:00Z",
       status: "created",
       location: "Los Angeles, CA",
-      description: "Shipment created"
+      description: "Shipment created and label generated"
     },
     {
       timestamp: "2023-10-06T09:15:00Z",
       status: "processing",
       location: "Los Angeles, CA",
-      description: "Shipment processing started"
+      description: "Package received at FastShip sorting facility"
     },
     {
       timestamp: "2023-10-07T11:45:00Z",
       status: "picked_up",
       location: "Los Angeles, CA",
-      description: "Shipment picked up by carrier"
+      description: "Shipment picked up by carrier and departed facility"
     },
     {
       timestamp: "2023-10-08T03:20:00Z",
       status: "in_transit",
       location: "San Francisco, CA",
-      description: "Shipment in transit"
+      description: "Package arrived at regional distribution center"
     },
     {
       timestamp: "2023-10-09T14:10:00Z",
       status: "in_transit",
       location: "Portland, OR",
-      description: "Shipment in transit to Seattle, WA"
+      description: "Package in transit to destination"
     },
     {
       timestamp: "2023-10-10T08:45:00Z",
       status: "in_transit",
       location: "Seattle, WA",
-      description: "Shipment arrived at local facility"
+      description: "Package arrived at local distribution center"
     }
   ],
   events: [

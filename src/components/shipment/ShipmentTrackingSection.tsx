@@ -14,9 +14,12 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp, MapPin, Truck, Clock, CheckCircle, AlertCircle, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 interface ShipmentTrackingSectionProps {
   shipment: ShipmentType;
@@ -39,7 +42,11 @@ function getStatusIcon(status: string) {
 
 export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const [viewMode, setViewMode] = useState<'timeline' | 'map'>('timeline');
+  const [viewMode, setViewMode] = useState<'timeline' | 'map'>('map'); // Default to map view
+  const [mapboxToken, setMapboxToken] = useState<string | null>(localStorage.getItem("mapbox_token"));
+  const [showTokenInput, setShowTokenInput] = useState(!mapboxToken);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
   
   const sortedTrackingHistory = [...shipment.trackingHistory].sort((a, b) => 
     new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
@@ -54,6 +61,131 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
     delivered: "bg-green-100 text-green-800",
     delayed: "bg-orange-100 text-orange-800",
     exception: "bg-red-100 text-red-800",
+  };
+
+  // Initialize Mapbox map when component mounts
+  useEffect(() => {
+    if (!mapboxToken || showTokenInput || !mapContainerRef.current || viewMode !== 'map') return;
+    
+    try {
+      mapboxgl.accessToken = mapboxToken;
+      
+      const map = new mapboxgl.Map({
+        container: mapContainerRef.current,
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [-95.7129, 37.0902], // Center of US
+        zoom: 3,
+        attributionControl: true
+      });
+      
+      map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+      mapRef.current = map;
+
+      // Add markers for each tracking event with coordinates
+      const chronologicalEvents = [...shipment.trackingHistory].sort((a, b) => 
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
+
+      // Mock coordinates for each event (normally these would come from the API)
+      const mockCoordinates = [
+        [-118.2437, 34.0522],  // Los Angeles
+        [-122.3301, 37.8270],  // San Francisco 
+        [-122.6765, 45.5231],  // Portland
+        [-122.3321, 47.6062],  // Seattle
+      ];
+
+      // Create markers and add them to the map
+      chronologicalEvents.forEach((event, index) => {
+        if (index < mockCoordinates.length) {
+          const [lng, lat] = mockCoordinates[index];
+          
+          // Create custom marker element
+          const el = document.createElement('div');
+          el.className = 'custom-marker';
+          el.style.width = '20px';
+          el.style.height = '20px';
+          el.style.borderRadius = '50%';
+          el.style.backgroundColor = getMarkerColor(event.status);
+          el.style.border = '2px solid white';
+          el.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
+
+          // Create popup
+          const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+            `<strong>${formatDate(event.timestamp)}</strong><br>${event.description}<br>${event.location}`
+          );
+
+          // Add marker to map
+          new mapboxgl.Marker(el)
+            .setLngLat([lng, lat])
+            .setPopup(popup)
+            .addTo(map);
+        }
+      });
+
+      // Draw route line between points
+      if (mockCoordinates.length >= 2 && map) {
+        map.on('load', () => {
+          map.addSource('route', {
+            'type': 'geojson',
+            'data': {
+              'type': 'Feature',
+              'properties': {},
+              'geometry': {
+                'type': 'LineString',
+                'coordinates': mockCoordinates
+              }
+            }
+          });
+          
+          map.addLayer({
+            'id': 'route',
+            'type': 'line',
+            'source': 'route',
+            'layout': {
+              'line-join': 'round',
+              'line-cap': 'round'
+            },
+            'paint': {
+              'line-color': '#3887be',
+              'line-width': 4,
+              'line-opacity': 0.75
+            }
+          });
+
+          // Fit map to show all markers
+          const bounds = new mapboxgl.LngLatBounds();
+          mockCoordinates.forEach(coord => bounds.extend(coord));
+          map.fitBounds(bounds, { padding: 50 });
+        });
+      }
+
+      return () => {
+        map.remove();
+      };
+    } catch (error) {
+      console.error("Error initializing map:", error);
+    }
+  }, [mapboxToken, showTokenInput, viewMode, shipment.trackingHistory]);
+  
+  const getMarkerColor = (status: string): string => {
+    switch (status) {
+      case 'created': return '#9c27b0';
+      case 'processing': return '#ffc107';
+      case 'picked_up': return '#3f51b5';
+      case 'in_transit': return '#2196f3';
+      case 'out_for_delivery': return '#00bcd4';
+      case 'delivered': return '#4caf50';
+      case 'delayed': return '#ff9800';
+      case 'exception': return '#f44336';
+      default: return '#9e9e9e';
+    }
+  };
+
+  const handleSaveToken = () => {
+    if (mapboxToken) {
+      localStorage.setItem("mapbox_token", mapboxToken);
+      setShowTokenInput(false);
+    }
   };
   
   return (
@@ -110,16 +242,16 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
                   Last updated: {formatDate(sortedTrackingHistory[0]?.timestamp || "")}
                 </div>
                 
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <div className="bg-white rounded-md p-2 flex-1">
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  <div className="bg-white rounded-md p-2">
                     <div className="text-xs text-muted-foreground">Carrier</div>
                     <div className="font-medium">{shipment.carrier.name}</div>
                   </div>
-                  <div className="bg-white rounded-md p-2 flex-1">
+                  <div className="bg-white rounded-md p-2">
                     <div className="text-xs text-muted-foreground">Tracking #</div>
                     <div className="font-medium">{shipment.carrier.trackingNumber}</div>
                   </div>
-                  <div className="bg-white rounded-md p-2 flex-1">
+                  <div className="bg-white rounded-md p-2">
                     <div className="text-xs text-muted-foreground">Status</div>
                     <Badge className={cn(
                       "mt-1", 
@@ -130,12 +262,12 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
                   </div>
                 </div>
                 
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <div className="bg-white rounded-md p-2 flex-1">
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <div className="bg-white rounded-md p-2">
                     <div className="text-xs text-muted-foreground">Created</div>
                     <div className="font-medium">{formatDate(shipment.createdAt)}</div>
                   </div>
-                  <div className="bg-white rounded-md p-2 flex-1">
+                  <div className="bg-white rounded-md p-2">
                     <div className="text-xs text-muted-foreground">Expected Delivery</div>
                     <div className="font-medium">{formatDate(shipment.expectedDelivery)}</div>
                   </div>
@@ -177,16 +309,36 @@ export function ShipmentTrackingSection({ shipment }: ShipmentTrackingSectionPro
                   ))}
                 </div>
               ) : (
-                <div className="h-[400px] bg-muted rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin size={48} className="mx-auto text-muted-foreground" />
-                    <p className="mt-2 text-muted-foreground">Map view not available in demo mode</p>
-                    <p className="text-xs text-muted-foreground">Integration with mapping service required</p>
-                  </div>
+                <div className="h-[500px] bg-muted rounded-lg flex flex-col">
+                  {showTokenInput ? (
+                    <div className="h-full flex flex-col items-center justify-center p-4">
+                      <MapPin size={32} className="text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium mb-2">Mapbox API Token Required</h3>
+                      <p className="text-sm text-center text-muted-foreground mb-4">
+                        Enter your Mapbox public token to view the interactive map
+                      </p>
+                      <div className="w-full max-w-md">
+                        <input
+                          type="text"
+                          value={mapboxToken || ''}
+                          onChange={(e) => setMapboxToken(e.target.value)}
+                          placeholder="pk.eyJ1Ijoi..."
+                          className="w-full p-2 border rounded-md mb-2"
+                        />
+                        <Button onClick={handleSaveToken} className="w-full">
+                          Save Token & Show Map
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div ref={mapContainerRef} className="h-full w-full rounded-lg" />
+                  )}
                 </div>
               )}
               
-              <div className="mt-6 bg-muted/50 p-4 rounded-lg">
+              <Separator className="my-6" />
+              
+              <div className="bg-muted/50 p-4 rounded-lg">
                 <div className="font-medium flex items-center mb-2">
                   <Calendar size={16} className="mr-2 text-primary" />
                   Delivery Information

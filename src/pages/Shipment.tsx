@@ -11,6 +11,7 @@ import { ShipmentFinancialsSection } from '@/components/shipment/ShipmentFinanci
 import { ShipmentTrackingSection } from '@/components/shipment/ShipmentTrackingSection';
 import { ShipmentHistorySection } from '@/components/shipment/ShipmentHistorySection';
 import { ShipmentReturnsSection } from '@/components/shipment/ShipmentReturnsSection';
+import { Separator } from '@/components/ui/separator';
 
 export default function Shipment() {
   const { id } = useParams<{ id: string }>();
@@ -34,7 +35,7 @@ export default function Shipment() {
         <ShipmentHeader shipment={shipment} />
         
         <div className="mt-6 space-y-6">
-          <Tabs defaultValue="details">
+          <Tabs defaultValue="tracking">
             <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="items">Items</TabsTrigger>
