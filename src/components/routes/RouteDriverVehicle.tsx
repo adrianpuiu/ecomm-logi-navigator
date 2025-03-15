@@ -10,6 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Driver, Vehicle, VehicleType } from "@/types/route";
+import { useAuth } from "@/contexts/AuthContext";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ShieldAlert } from "lucide-react";
 
 // Mock data for drivers and vehicles
 const mockDrivers: Driver[] = [
@@ -94,6 +97,12 @@ export function RouteDriverVehicle({
   selectedVehicle,
   setSelectedVehicle,
 }: RouteDriverVehicleProps) {
+  const { hasAnyRole } = useAuth();
+  
+  // Check if user has permission to assign drivers/vehicles
+  const canAssignDrivers = hasAnyRole(["administrator", "dispatcher", "transportation_manager"]);
+  const canAssignVehicles = hasAnyRole(["administrator", "dispatcher", "transportation_manager"]);
+
   return (
     <Card>
       <CardHeader>
@@ -102,24 +111,35 @@ export function RouteDriverVehicle({
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="driver-select">Driver</Label>
-          <Select
-            value={selectedDriver?.id.toString() || ""}
-            onValueChange={(value) => {
-              const driver = mockDrivers.find((d) => d.id.toString() === value) || null;
-              setSelectedDriver(driver);
-            }}
-          >
-            <SelectTrigger id="driver-select">
-              <SelectValue placeholder="Select a driver" />
-            </SelectTrigger>
-            <SelectContent>
-              {mockDrivers.map((driver) => (
-                <SelectItem key={driver.id} value={driver.id.toString()}>
-                  {driver.name} {!driver.available && "(Unavailable)"}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          
+          {!canAssignDrivers ? (
+            <Alert variant="warning">
+              <ShieldAlert className="h-4 w-4" />
+              <AlertTitle>Permission Required</AlertTitle>
+              <AlertDescription>
+                You don't have permission to assign drivers. Contact a dispatcher or administrator.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <Select
+              value={selectedDriver?.id.toString() || ""}
+              onValueChange={(value) => {
+                const driver = mockDrivers.find((d) => d.id.toString() === value) || null;
+                setSelectedDriver(driver);
+              }}
+            >
+              <SelectTrigger id="driver-select">
+                <SelectValue placeholder="Select a driver" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockDrivers.map((driver) => (
+                  <SelectItem key={driver.id} value={driver.id.toString()}>
+                    {driver.name} {!driver.available && "(Unavailable)"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
           
           {selectedDriver && (
             <div className="mt-2 text-sm text-muted-foreground">
@@ -132,24 +152,35 @@ export function RouteDriverVehicle({
         
         <div className="space-y-2">
           <Label htmlFor="vehicle-select">Vehicle</Label>
-          <Select
-            value={selectedVehicle?.id.toString() || ""}
-            onValueChange={(value) => {
-              const vehicle = mockVehicles.find((v) => v.id.toString() === value) || null;
-              setSelectedVehicle(vehicle);
-            }}
-          >
-            <SelectTrigger id="vehicle-select">
-              <SelectValue placeholder="Select a vehicle" />
-            </SelectTrigger>
-            <SelectContent>
-              {mockVehicles.map((vehicle) => (
-                <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
-                  {vehicle.name} {!vehicle.available && "(Unavailable)"}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          
+          {!canAssignVehicles ? (
+            <Alert variant="warning">
+              <ShieldAlert className="h-4 w-4" />
+              <AlertTitle>Permission Required</AlertTitle>
+              <AlertDescription>
+                You don't have permission to assign vehicles. Contact a dispatcher or administrator.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <Select
+              value={selectedVehicle?.id.toString() || ""}
+              onValueChange={(value) => {
+                const vehicle = mockVehicles.find((v) => v.id.toString() === value) || null;
+                setSelectedVehicle(vehicle);
+              }}
+            >
+              <SelectTrigger id="vehicle-select">
+                <SelectValue placeholder="Select a vehicle" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockVehicles.map((vehicle) => (
+                  <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
+                    {vehicle.name} {!vehicle.available && "(Unavailable)"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
           
           {selectedVehicle && (
             <div className="mt-2 text-sm text-muted-foreground">

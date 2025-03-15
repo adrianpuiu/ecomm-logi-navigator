@@ -80,6 +80,30 @@ export type Database = {
           },
         ]
       }
+      offices: {
+        Row: {
+          created_at: string
+          id: string
+          location: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -316,6 +340,41 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          office_id: string | null
+          role: Database["public"]["Enums"]["tms_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          office_id?: string | null
+          role: Database["public"]["Enums"]["tms_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          office_id?: string | null
+          role?: Database["public"]["Enums"]["tms_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_office_id_fkey"
+            columns: ["office_id"]
+            isOneToOne: false
+            referencedRelation: "offices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           capacity: number
@@ -390,6 +449,12 @@ export type Database = {
             }
             Returns: unknown
           }
+      get_user_office_id: {
+        Args: {
+          requested_role: Database["public"]["Enums"]["tms_role"]
+        }
+        Returns: string
+      }
       halfvec_avg: {
         Args: {
           "": number[]
@@ -413,6 +478,16 @@ export type Database = {
           "": unknown[]
         }
         Returns: number
+      }
+      has_any_role: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          requested_role: Database["public"]["Enums"]["tms_role"]
+        }
+        Returns: boolean
       }
       hnsw_bit_support: {
         Args: {
@@ -585,7 +660,17 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      tms_role:
+        | "administrator"
+        | "dispatcher"
+        | "planner"
+        | "freight_manager"
+        | "master_data_specialist"
+        | "finance"
+        | "customer_service"
+        | "shipper"
+        | "carrier"
+        | "transportation_manager"
     }
     CompositeTypes: {
       [_ in never]: never
