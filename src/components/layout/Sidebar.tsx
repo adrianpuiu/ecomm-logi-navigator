@@ -68,7 +68,7 @@ export function MainSidebar() {
   };
 
   return (
-    <ShadcnSidebar>
+    <ShadcnSidebar defaultCollapsed={false}>
       <SidebarHeader className="flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 px-2">
           <Truck className="h-6 w-6 text-primary" />
