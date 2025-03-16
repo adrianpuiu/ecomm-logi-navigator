@@ -1,10 +1,9 @@
 
 import React from "react";
-import { TmsRole } from "@/contexts/auth";
 
 interface RoleGuardProps {
   children: React.ReactNode;
-  allowedRoles: TmsRole[];
+  allowedRoles?: string[];
   fallbackPath?: string;
 }
 
