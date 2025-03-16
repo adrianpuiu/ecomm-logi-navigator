@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { ShipmentType } from "@/types/shipment";
 import { mockShipment } from "@/data/mockShipment";
 
-export function useFetchShipment(id: string) {
+export function useFetchShipment(id?: string) {
   const [shipment, setShipment] = useState<ShipmentType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
