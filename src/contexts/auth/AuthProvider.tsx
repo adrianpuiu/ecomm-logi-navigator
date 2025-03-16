@@ -10,8 +10,14 @@ export const AuthContext = createContext<any>({
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   children 
 }) => {
+  // Always provide these values to avoid undefined errors
+  const contextValue = {
+    isAuthenticated: true,
+    isLoading: false
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated: true, isLoading: false }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
