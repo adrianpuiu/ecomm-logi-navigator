@@ -24,9 +24,11 @@ import {
   Route, 
   Users, 
   Timer, 
-  Settings 
+  Settings,
+  User
 } from "lucide-react";
-import { UserMenu } from "@/components/auth/UserMenu";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 // Export all shadcn sidebar components for external use
 export {
@@ -156,7 +158,13 @@ export function MainSidebar() {
       </SidebarContent>
       
       <SidebarFooter className="p-4">
-        <UserMenu />
+        <Link to="/profile">
+          <Button variant="outline" size="icon" className="rounded-full h-9 w-9 p-0">
+            <Avatar className="h-9 w-9">
+              <AvatarFallback>U</AvatarFallback>
+            </Avatar>
+          </Button>
+        </Link>
       </SidebarFooter>
     </ShadcnSidebar>
   );
