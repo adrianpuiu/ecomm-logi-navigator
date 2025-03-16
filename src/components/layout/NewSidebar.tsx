@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -14,11 +14,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Settings,
-  LogOut
+  User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { UserMenu } from "@/components/auth/UserMenu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -134,13 +133,13 @@ export function NewSidebar() {
         "p-4 mt-auto border-t",
         collapsed ? "flex justify-center" : ""
       )}>
-        {collapsed ? (
-          <Avatar className="h-9 w-9">
-            <AvatarFallback>U</AvatarFallback>
-          </Avatar>
-        ) : (
-          <UserMenu />
-        )}
+        <Link to="/profile">
+          <Button variant="outline" size="icon" className="rounded-full h-9 w-9 p-0">
+            <Avatar className="h-9 w-9">
+              <AvatarFallback>U</AvatarFallback>
+            </Avatar>
+          </Button>
+        </Link>
       </div>
     </div>
   );

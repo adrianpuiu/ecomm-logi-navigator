@@ -23,9 +23,6 @@ export default function Unauthorized() {
             <Button asChild>
               <Link to="/">Return to Dashboard</Link>
             </Button>
-            <Button variant="outline" asChild>
-              <Link to="/auth/login">Switch Account</Link>
-            </Button>
           </div>
         </div>
       </div>

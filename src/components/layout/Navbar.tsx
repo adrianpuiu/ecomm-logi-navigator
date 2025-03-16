@@ -8,10 +8,12 @@ import {
   BarChart3, 
   Package, 
   Settings,
-  Search 
+  Search,
+  User
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { UserMenu } from "@/components/auth/UserMenu";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -106,7 +108,11 @@ export function Navbar() {
               className="w-full rounded-full pl-8 pr-4 bg-secondary/50" 
             />
           </div>
-          <UserMenu />
+          <Button variant="outline" size="icon" className="rounded-full h-8 w-8 p-0">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback>U</AvatarFallback>
+            </Avatar>
+          </Button>
         </div>
       </div>
     </div>
